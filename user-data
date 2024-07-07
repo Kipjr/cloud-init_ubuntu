@@ -1,4 +1,27 @@
 #cloud-config
+hostname: ${HOSTNAME}
+fqdn: ${HOSTNAME}.${SEARCH_DOMAIN}
+
+manage_etc_hosts: false
+package_upgrade: true
+chpasswd:
+  expire: True
+ssh_pwauth: False
+packages:
+  - qemu-guest-agent
+  - vim
+runcmd:
+  - systemctl start qemu-guest-agent
+  - netplan apply
+  - chown -R ${CI_USER}:${CI_USER} /home/${CI_USER}
+users:
+  - name: ${CI_USER}
+    plain_text_passwd: ${CI_PASSWORD}
+    groups: [adm,sudo]
+    lock-passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    
 
 # Documentation on data sources configuration options
 datasource:
@@ -9,12 +32,6 @@ datasource:
     meta-data:
       instance-id: i-87018aed
       local-hostname: myhost.internal
-
-password: password
-chpasswd:
-  expire: True
-ssh_pwauth: False
-
 
 # Keys such as autoinstall, preruncmd, and postruncmd are not used by cloud-init to configure anything.
 autoinstall:
