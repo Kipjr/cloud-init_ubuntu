@@ -3,17 +3,20 @@ hostname: ${HOSTNAME}
 fqdn: ${HOSTNAME}.${SEARCH_DOMAIN}
 
 manage_etc_hosts: false
-package_upgrade: true
 chpasswd:
   expire: True
 ssh_pwauth: False
+
+package_update: true
+package_upgrade: true
 packages:
+  - wget
+  - apt-transport-https
+  - software-properties-common
+  - ca-certificates
+  - curl
   - qemu-guest-agent
   - vim
-runcmd:
-  - systemctl start qemu-guest-agent
-  - netplan apply
-  - chown -R ${CI_USER}:${CI_USER} /home/${CI_USER}
 users:
   - name: ${CI_USER}
     plain_text_passwd: ${CI_PASSWORD}
@@ -21,7 +24,16 @@ users:
     lock-passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
-    
+runcmd:
+  - systemctl start qemu-guest-agent
+  - netplan apply
+  - chown -R ${CI_USER}:${CI_USER} /home/${CI_USER}
+  - wget -q https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb
+  - sudo dpkg -i packages-microsoft-prod.deb
+  - sudo apt-get update
+  - sudo apt-get install -y powershell
+  - curl -o /tmp/install_ubuntu_server.sh.ps1 https://raw.githubusercontent.com/kipjr/cloud-init_ubuntu/master/install_ubuntu_server.sh.ps1
+  - pwsh /tmp/install_ubuntu_server.sh.ps1
 
 # Documentation on data sources configuration options
 datasource:
