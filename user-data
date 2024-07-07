@@ -1,8 +1,22 @@
 #cloud-config
+
+# Documentation on data sources configuration options
+datasource:
+  NoCloud:
+    seedfrom: https://raw.githubusercontent.com/Kipjr/cloud-init_ubuntu/master/
+    fs_label: cidata
+    user-data: |
+    meta-data:
+      instance-id: i-87018aed
+      local-hostname: myhost.internal
+
 password: password
 chpasswd:
   expire: True
 ssh_pwauth: False
+
+
+# Keys such as autoinstall, preruncmd, and postruncmd are not used by cloud-init to configure anything.
 autoinstall:
   version: 1
   refresh-installer:
