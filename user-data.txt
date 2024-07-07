@@ -1,0 +1,132 @@
+#cloud-config
+autoinstall:
+  version: 1
+  refresh-installer:
+    update: no
+    channel: edge 
+  early-commands:
+    - /usr/bin/mkdir -p /mnt/_SOFTWARE   
+    - datetime="$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep 'Date:' | cut -d' ' -f5-8)Z" && /usr/bin/date -s "$datetime";
+    - | 
+      [ "$(df /cdrom --output=fstype 2>/dev/null | tail -n 1)" = "vfat" ] && mount --bind /cdrom/_SOFTWARE /mnt/_SOFTWARE || [ "$(df /isodevice --output=fstype 2>/dev/null | tail -n 1)" = "vfat" ]  && mount --bind /isodevice/_SOFTWARE /mnt/_SOFTWARE || apt-get update && apt-get install -y nfs-common && mount ${__TEMPLATE__IP_DEPLOYSERVER}:${__TEMPLATE__PATH_DEPLOYSERVER_SOFTWARE} /mnt/_SOFTWARE
+    - /mnt/_SOFTWARE/000_initEarlyCommands.sh --maxpackagetype=8
+  apt:
+    geoip: false
+    preserve_sources_list: false
+    primary:
+      - arches:
+          - amd64
+        uri: 'http://archive.ubuntu.com/ubuntu'
+      - arches:
+          - default
+        uri: 'http://ports.ubuntu.com/ubuntu-ports'
+  identity: 
+    hostname: ubuntu
+    #mkpasswd -m sha-512
+    password: >-
+      ${__TEMPLATE__FIRST_PASSWORD}
+    realname: ${__TEMPLATE__FIRST_USERNAME}
+    username: ${__TEMPLATE__FIRST_USERNAME}
+  user-data:
+    disable_root: false
+  keyboard: 
+    layout: us
+    toggle: null
+    variant: intl
+  locale: en_US.UTF-8
+  ssh:
+    allow-pw: true
+    authorized-keys: []      
+    install-server: false
+  #packages:
+
+  late-commands:
+    - /mnt/_SOFTWARE/200_initLateCommands.sh
+  updates: security
+  storage:
+    version: 1
+    config: 
+      - id: disk0
+        type: disk
+        ptable: gpt
+        match:
+          size: largest
+        wipe: superblock-recursive
+        preserve: false
+        name: ''
+        grub_device: false
+      - id: partition-0
+        type: partition
+        device: disk0
+        size: 1G
+        wipe: superblock-recursive
+        flag: boot
+        number: 1
+        preserve: false
+        grub_device: true
+      - id: format-0
+        type: format
+        fstype: fat32
+        volume: partition-0
+        preserve: false
+      - id: partition-1
+        type: partition
+        device: disk0
+        size: 1G
+        wipe: superblock-recursive
+        flag: ''
+        number: 2
+        preserve: false
+        grub_device: false
+      - id: format-1
+        type: format
+        fstype: ext4
+        volume: partition-1
+        preserve: false
+      - id: partition-2
+        type: partition
+        device: disk0
+        size: -1
+        wipe: superblock-recursive
+        flag: ''
+        number: 3
+        preserve: false
+        grub_device: false
+      - id: dm_crypt-0
+        type: dm_crypt
+        volume: partition-2
+        keyfile: /tmp/dm_crypt.key
+        preserve: false
+      - id: lvm_volgroup-0
+        type: lvm_volgroup
+        name: ubuntu-vg
+        devices:
+          - dm_crypt-0
+        preserve: false
+      - id: lvm_partition-0
+        type: lvm_partition
+        name: ubuntu-lv
+        volgroup: lvm_volgroup-0
+        size: -1
+        preserve: false
+      - id: format-2
+        type: format
+        fstype: ext4
+        volume: lvm_partition-0
+        preserve: false
+      - id: mount-2
+        type: mount
+        device: format-2
+        path: /
+      - id: mount-1
+        type: mount
+        device: format-1
+        path: /boot
+      - id: mount-0
+        type: mount
+        device: format-0
+        path: /boot/efi
+  system_upgrade:
+    enabled: False
+  error-commands:
+    - /mnt/_SOFTWARE/ERROR.sh
