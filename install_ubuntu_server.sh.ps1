@@ -23,7 +23,9 @@ $USERNAME = ${env:USER}
 
 # Prepare docker for alternative filesystem
 sudo mkdir -p /mnt/disk2/docker
-sudo /usr/bin/ln -s /mnt/disk2/docker /home/${USERNAME}/.local/share/docker
+if(-Not(Test-Path -Path "/home/${USERNAME}/.local/share/docker")){
+    sudo /usr/bin/ln -s /mnt/disk2/docker /home/${USERNAME}/.local/share/docker
+}
 
 # disable interactive mode
 $autorestart=@'
