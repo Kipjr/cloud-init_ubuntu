@@ -19,6 +19,7 @@ if ( $UUID -eq 0) {
     Write-Host "Please run as a regular user. Exiting..."
     exit
 }
+$USER = ${env:USER}
 
 # Prepare docker for alternative filesystem
 sudo mkdir -p /mnt/disk2/docker
