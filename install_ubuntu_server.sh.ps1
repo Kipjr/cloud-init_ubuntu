@@ -29,7 +29,7 @@ sudo /usr/bin/ln -s /mnt/disk2/docker /home/${USERNAME}/.local/share/docker
 $autorestart=@'
 $nrconf{restart} = 'a';
 '@
-sudo Out-File -FilePath /etc/needrestart/conf.d/90-autorestart.conf -InputObject $autorestart
+"$autorestart" | sudo tee /etc/needrestart/conf.d/90-autorestart.conf
 
 $DEBIAN_FRONTEND="noninteractive"
 sudo apt-get update
