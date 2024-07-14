@@ -26,9 +26,10 @@ sudo mkdir -p /mnt/disk2/docker
 sudo /usr/bin/ln -s /mnt/disk2/docker /home/${USERNAME}/.local/share/docker
 
 # disable interactive mode
-@'
+$autorestart=@'
 $nrconf{restart} = 'a';
-'@ | Out-File -FilePath /etc/needrestart/conf.d/90-autorestart.conf
+'@
+sudo Out-File -FilePath /etc/needrestart/conf.d/90-autorestart.conf -InputObject $autorestart
 
 $DEBIAN_FRONTEND="noninteractive"
 sudo apt-get update
