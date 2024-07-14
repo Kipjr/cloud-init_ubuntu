@@ -40,7 +40,7 @@ sudo apt-get full-upgrade -y
 # Install required packages
 $packages = @(
     "ufw", "ethtool", "htop", "lshw", "screen", "open-vm-tools",
-    "nano", "net-tools", "dnsutils", "macchanger", "openssl", "ufw"
+    "nano", "net-tools", "dnsutils", "openssl", "ufw"
     "build-essential", "p7zip-full", "hw-probe", "snmpd", "snmp-mibs-downloader",
     "curl", "gnupg", "apt-transport-https", "ca-certificates", "libssl-dev", "git",
     "software-properties-common", "openssh-server", "uidmap", "dbus-user-session", "docker-ce-rootless-extras", "sscep"
