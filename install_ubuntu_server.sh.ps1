@@ -53,7 +53,7 @@ foreach ($package in $packages) {
 # Configure Webmin
 Write-Output "Installing Webmin..."
 curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
-sudo sh setup-repos.sh
+sudo sh setup-repos.sh -f
 sudo apt-get update
 sudo apt-get install -y webmin --install-recommend
 # Install Docker
