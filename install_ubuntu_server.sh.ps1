@@ -19,11 +19,11 @@ if ( $UUID -eq 0) {
     Write-Host "Please run as a regular user. Exiting..."
     exit
 }
-$USER = ${env:USER}
+$USERNAME = ${env:USER}
 
 # Prepare docker for alternative filesystem
 sudo mkdir -p /mnt/disk2/docker
-sudo /usr/bin/ln -s /mnt/disk2/docker /home/${USER}/.local/share/docker
+sudo /usr/bin/ln -s /mnt/disk2/docker /home/${USERNAME}/.local/share/docker
 
 sudo apt-get update
 sudo apt-get full-upgrade -y
@@ -61,8 +61,8 @@ Write-Output "Installing Docker (rootless)..."
 sudo systemctl disable --now docker.service docker.socket
 sudo rm /var/run/docker.sock
 dockerd-rootless-setuptool.sh install
-echo 'export PATH=/usr/bin:$PATH' >> /home/${USER}/.bashrc
-echo "export DOCKER_HOST=unix:///run/user/$(id -u ${USER})/docker.sock" >> /home/${USER}/.bashrc
+echo 'export PATH=/usr/bin:$PATH' >> /home/${USERNAME}/.bashrc
+echo "export DOCKER_HOST=unix:///run/user/$(id -u ${USERNAME})/docker.sock" >> /home/${USERNAME}/.bashrc
 systemctl --user start docker
 systemctl --user enable docker
 sudo loginctl enable-linger $(whoami)
@@ -101,10 +101,10 @@ services:
       - no-new-privileges:true
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /run/user/$(id -u ${USER})/docker.sock:/var/run/docker.sock
-      - /home/${USER}/.local/share/docker/volumes:/var/lib/docker/volumes
+      - /run/user/$(id -u ${USERNAME})/docker.sock:/var/run/docker.sock
+      - /home/${USERNAME}/.local/share/docker/volumes:/var/lib/docker/volumes
     ports:
       - 9001:9001
 "@
 
-$dockerComposeContent | Out-File -FilePath "/home/${USER}/docker/portainer/docker-compose.yml" -Force
+$dockerComposeContent | Out-File -FilePath "/home/${USERNAME}/docker/portainer/docker-compose.yml" -Force
