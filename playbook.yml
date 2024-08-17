@@ -1,9 +1,26 @@
 ---
+      
 - name: Configure and setup the server
   hosts: localhost
   become: yes
 
   tasks:
+    - name: Prompt for user and host FQDN
+      vars_prompt:
+        - name: ansible_user
+          prompt: "Enter the username"
+          private: no
+        - name: fqdn
+          prompt: "Enter the host FQDN"
+          private: no  
+    - name: Set the machine FQDN
+      hostname:
+        name: "{{ fqdn }}"
+        
+    - name: Set timezone to Europe/Amsterdam
+      timezone:
+        name: Europe/Amsterdam
+    
     - name: Ensure all packages are up to date
       apt:
         update_cache: yes
@@ -36,9 +53,45 @@
           - uidmap
           - dbus-user-session
           - docker-ce-rootless-extras
-          - sscep
         state: present
+        
+    - name: Add Microsoft APT repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main"
+        state: present
+    
+    - name: Install PowerShell Core
+      apt:
+        name: powershell
+        state: present
+    - name: Generate SSH private key for user
+      user:
+        name: "{{ ansible_user }}"
+        generate_ssh_key: yes
+    
+    - name: Add SSH public key to authorized_keys
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ lookup('file', '/home/{{ ansible_user }}/.ssh/id_rsa.pub') }}"
 
+    - name: Disable SSH password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+    
+    - name: Enable SSH key-based login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PubkeyAuthentication'
+        line: 'PubkeyAuthentication yes'
+        state: present
+    
+    - name: Restart SSH service
+      service:
+        name: ssh
+        state: restarted
     - name: Add Docker official GPG key
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
