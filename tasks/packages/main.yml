@@ -64,9 +64,15 @@
   ansible.builtin.apt:
     name: powershell
     state: present
+    
+- name: Check if Webmin is installed
+  stat:
+    path: /etc/webmin
+  register: dir_check_webmin
 
 - name: Configure Webmin repository and install Webmin
   become: true
+  when: dir_check_webmin.stat.exists
   ansible.builtin.shell: |
     curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
     sh setup-repos.sh -f
