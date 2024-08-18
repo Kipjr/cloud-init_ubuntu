@@ -158,9 +158,10 @@
         owner: "{{ ansible_user_uid }}"
         group: "{{ ansible_user_gid }}"
     
-    - name: Set timezone to Europe/Amsterdam
+    - name: set timezone to Europe/Amsterdam
       become: yes
-      timezone:
+      become_method: sudo
+      community.general.timezone:
         name: Europe/Amsterdam
 
     - name: Ensure the system timezone is up-to-date
