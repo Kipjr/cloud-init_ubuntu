@@ -8,7 +8,6 @@ users:
   - name: ${CI_USER}
     plain_text_passwd: ${CI_PASSWORD}
     groups: [adm,sudo]
-    lock-passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
 chpasswd:
