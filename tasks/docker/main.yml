@@ -14,12 +14,12 @@
 
     - name: Ensure all packages are up to date
       become: true
-      apt:
+      ansible.builtin.apt:
         update_cache: true
 
     - name: Install Docker packages
       become: true
-      apt:
+      ansible.builtin.apt:
         name:
           - docker-ce
           - docker-ce-cli
