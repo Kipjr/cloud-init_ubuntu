@@ -1,8 +1,7 @@
 ---
 
-- hosts: all
+- name: Ubuntu Installer
+  hosts: all
   become: true
-
   roles:
-
       - role: "{{ playbook_dir }}"
