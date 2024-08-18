@@ -2,7 +2,7 @@
 
 - name: Apply CIS-remediation
   hosts: all
-  become: yes
+  become: true
   vars:
     ansible_become: true
     ansible_become_user: "root"
