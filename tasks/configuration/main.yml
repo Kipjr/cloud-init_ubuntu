@@ -1,4 +1,5 @@
 ---
+
     - name: Set the machine FQDN
       become: true
       ansible.builtin.hostname:
