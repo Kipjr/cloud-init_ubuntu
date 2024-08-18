@@ -72,7 +72,7 @@
     - name: Add Microsoft APT repository
       become: yes
       apt_repository:
-        repo: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main"
+        repo: "deb [arch={{ ansible_architecture }}] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
         state: present
     
     - name: Install PowerShell Core
