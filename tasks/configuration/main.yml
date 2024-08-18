@@ -1,67 +1,62 @@
 ---
-
     - name: Set the machine FQDN
-      become: yes
-      hostname:
+      become: true
+      ansible.builtin.hostname:
         name: "{{ ansible_fqdn }}"
-    - name: set timezone to Europe/Amsterdam
-      become: yes
+
+    - name: Set timezone to Europe/Amsterdam
+      become: true
       become_method: sudo
       community.general.timezone:
         name: Europe/Amsterdam
 
-    - name: Ensure the system timezone is up-to-date
-      become: yes
-      apt:
-        name: tzdata
-        state: latest
-
     - name: Restart the systemd-timedated service
-      become: yes
-      service:
+      become: true
+      ansible.builtin.service:
         name: systemd-timedated
         state: restarted
 
     - name: Enable unattended upgrades
-      become: yes
-      copy:
+      become: true
+      ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/20auto-upgrades
+        mode: 0644
         content: |
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Unattended-Upgrade "1";
 
     - name: Generate SSH private key for user
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_user_id }}"
-        generate_ssh_key: yes
-    
+        generate_ssh_key: true
+
     - name: Add SSH public key to authorized_keys
-      authorized_key:
+      ansible.posix.authorized_key:
         user: "{{ ansible_user_id }}"
         key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
 
     - name: Disable SSH password authentication
-      become: yes
-      lineinfile:
+      become: true
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PasswordAuthentication'
         line: 'PasswordAuthentication no'
         state: present
-    
+
     - name: Enable SSH key-based login
-      become: yes
-      lineinfile:
+      become: true
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PubkeyAuthentication'
         line: 'PubkeyAuthentication yes'
         state: present
-    
+
     - name: Restart SSH service
-      become: yes
-      service:
+      become: true
+      ansible.builtin.service:
         name: ssh
         state: restarted
-        
+
 #    - name: Configure additional partition as xfs
 #      filesystem:
 #        fstype: xfs
