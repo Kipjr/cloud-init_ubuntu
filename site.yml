@@ -1,8 +1,10 @@
----
-      
 - name: Configure and setup the server
   hosts: localhost
   become: yes
+
+  vars:
+    default_user: "{{ lookup('env', 'USER') }}"  # Fallback to the current logged-in user
+    default_fqdn: "{{ ansible_hostname }}.{{ lookup('dig', 'search') }}"  # Fallback using the hostname and search domain
 
   tasks:
     - name: Prompt for user and host FQDN
@@ -10,9 +12,13 @@
         - name: ansible_user
           prompt: "Enter the username"
           private: no
+          default: "{{ default_user }}"  # Fallback to default_user if not provided
+
         - name: fqdn
           prompt: "Enter the host FQDN"
-          private: no  
+          private: no
+          default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
+
     - name: Set the machine FQDN
       hostname:
         name: "{{ fqdn }}"
@@ -64,6 +70,7 @@
       apt:
         name: powershell
         state: present
+
     - name: Generate SSH private key for user
       user:
         name: "{{ ansible_user }}"
@@ -92,6 +99,7 @@
       service:
         name: ssh
         state: restarted
+    
     - name: Add Docker official GPG key
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -134,23 +142,23 @@
         dpkg-reconfigure --priority=low unattended-upgrades
         sed -i 's/\/\/\s*"\${distro_id}:\${distro_codename}-updates";/"\${distro_id}:\${distro_codename}-updates";/' /etc/apt/apt.conf.d/50unattended-upgrades
 
-    - name: Configure additional partition as xfs
-      filesystem:
-        fstype: xfs
-        dev: /dev/sdb1  # Replace with your actual partition
+#    - name: Configure additional partition as xfs
+#      filesystem:
+#        fstype: xfs
+#        dev: /dev/sdb1  # Replace with your actual partition
 
-    - name: Mount the partition to /mnt/disk2
-      mount:
-        path: /mnt/disk2
-        src: /dev/sdb1
-        fstype: xfs
-        state: mounted
+ #   - name: Mount the partition to /mnt/disk2
+ #     mount:
+ #       path: /mnt/disk2
+ #       src: /dev/sdb1
+ #       fstype: xfs
+ #       state: mounted
 
-    - name: Symlink ~/.local/share/docker to /mnt/disk2/data/docker
-      file:
-        src: /mnt/disk2/data/docker
-        dest: /home/{{ ansible_user }}/.local/share/docker
-        state: link
+#    - name: Symlink ~/.local/share/docker to /mnt/disk2/data/docker
+#      file:
+#        src: /mnt/disk2/data/docker
+#        dest: /home/{{ ansible_user }}/.local/share/docker
+#        state: link
 
     - name: Configure Webmin repository and install Webmin
       shell: |
@@ -201,4 +209,4 @@
     - role: UBUNTU22-CIS
       when:
         - ansible_os_family == 'UBUNTU'
-        - ansible_distribution_major_version | version_compare('22', '=')
+        - ansible_distribution_major_version is version('22', '=')
