@@ -4,17 +4,17 @@ fqdn: ${CI_HOSTNAME}.${CI_SEARCH_DOMAIN}
 manage_etc_hosts: True
 
 users:
-  - default
   - name: ${CI_USER}
     plain_text_passwd: ${CI_PASSWORD}
     groups: [adm,sudo]
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
+    lock_passwd: false
+    ssh-authorized-keys:
+      - ${CI_SSH_AUTH_KEY}
 chpasswd:
-  expire: False
-ssh_pwauth: True
-ssh_authorized_keys:
-  - ${CI_SSH_AUTH_KEY}
+  expire: true
+ssh_pwauth: false
 
 package_update: true
 package_upgrade: true
@@ -22,7 +22,9 @@ packages:
   - apt-transport-https
   - software-properties-common
   - git
+
 ansible:
+  package_name: ansible-core
   install_method: distro
   pull:
     url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
