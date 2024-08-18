@@ -119,6 +119,12 @@
         systemctl --user enable docker
         loginctl enable-linger {{ ansible_user_id }}
 
+    - name: Ensure the directory for Portainer exists
+      file:
+        path: /home/{{ ansible_user_id }}/docker/portainer
+        state: directory
+        mode: '0750'
+
     - name: Configure Portainer with Docker Compose
       copy:
         dest: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
