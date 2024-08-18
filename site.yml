@@ -1,6 +1,10 @@
 - name: Configure and setup the server
   hosts: localhost
   become: yes
+  
+  tasks:
+    - name: Gather facts
+      setup:
 
   vars:
     default_user: "{{ lookup('env', 'USER') | default('ansible') }}"  # Fallback to the logged-in user, or 'ansible' if not found
