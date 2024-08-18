@@ -24,8 +24,8 @@ packages:
   - git
 
 ansible:
-  package_name: ansible-core
-  install_method: distro
+  package_name: ansible
+  install_method: pip
   pull:
     url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
     playbook_name: site.yml
