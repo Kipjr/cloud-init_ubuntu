@@ -3,22 +3,21 @@
   become: yes
 
   vars:
-    default_user: "{{ lookup('env', 'USER') }}"  # Fallback to the current logged-in user
-    default_fqdn: "{{ ansible_hostname }}.{{ lookup('dig', 'search') }}"  # Fallback using the hostname and search domain
+    default_user: "{{ lookup('env', 'USER') | default('ansible') }}"  # Fallback to the logged-in user, or 'ansible' if not found
+    default_fqdn: "{{ ansible_hostname }}.{{ lookup('dig', 'search') | default('localdomain') }}"  # Fallback using the hostname and search domain
+
+  vars_prompt:
+    - name: ansible_user
+      prompt: "Enter the username"
+      private: no
+      default: "{{ default_user }}"  # Fallback to default_user if not provided
+
+    - name: fqdn
+      prompt: "Enter the host FQDN"
+      private: no
+      default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
 
   tasks:
-    - name: Prompt for user and host FQDN
-      vars_prompt:
-        - name: ansible_user
-          prompt: "Enter the username"
-          private: no
-          default: "{{ default_user }}"  # Fallback to default_user if not provided
-
-        - name: fqdn
-          prompt: "Enter the host FQDN"
-          private: no
-          default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
-
     - name: Set the machine FQDN
       hostname:
         name: "{{ fqdn }}"
