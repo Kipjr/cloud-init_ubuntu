@@ -21,6 +21,7 @@ python3 -m pip install --user ansible
 mkdir -p "${WORKING_DIR}" && cd "${WORKING_DIR}"
 git clone "${GITHUB_REPO_URL}" git_repo && cd ./git_repo
 if [ -f "${PLAYBOOK_NAME}.yaml" ]; then
+    ansible-galaxy install -r collections/requirements.yml
     ansible-playbook "${ANSIBLE_ARG}" "${PLAYBOOK_NAME}"
 else
     echo "Playbook ${PLAYBOOK_NAME} does not exist."
