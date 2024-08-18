@@ -19,6 +19,7 @@
         name: Europe/Amsterdam
     
     - name: Ensure all packages are up to date
+      become: yes
       apt:
         update_cache: yes
         upgrade: full
