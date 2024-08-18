@@ -1,0 +1,81 @@
+---
+
+    - name: Set the machine FQDN
+      become: yes
+      hostname:
+        name: "{{ ansible_fqdn }}"
+    - name: set timezone to Europe/Amsterdam
+      become: yes
+      become_method: sudo
+      community.general.timezone:
+        name: Europe/Amsterdam
+
+    - name: Ensure the system timezone is up-to-date
+      become: yes
+      apt:
+        name: tzdata
+        state: latest
+
+    - name: Restart the systemd-timedated service
+      become: yes
+      service:
+        name: systemd-timedated
+        state: restarted
+
+    - name: Enable unattended upgrades
+      become: yes
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+
+    - name: Generate SSH private key for user
+      user:
+        name: "{{ ansible_user_id }}"
+        generate_ssh_key: yes
+    
+    - name: Add SSH public key to authorized_keys
+      authorized_key:
+        user: "{{ ansible_user_id }}"
+        key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
+
+    - name: Disable SSH password authentication
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+    
+    - name: Enable SSH key-based login
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PubkeyAuthentication'
+        line: 'PubkeyAuthentication yes'
+        state: present
+    
+    - name: Restart SSH service
+      become: yes
+      service:
+        name: ssh
+        state: restarted
+        
+#    - name: Configure additional partition as xfs
+#      filesystem:
+#        fstype: xfs
+#        dev: /dev/sdb1  # Replace with your actual partition
+
+ #   - name: Mount the partition to /mnt/disk2
+ #     mount:
+ #       path: /mnt/disk2
+ #       src: /dev/sdb1
+ #       fstype: xfs
+ #       state: mounted
+
+#    - name: Symlink ~/.local/share/docker to /mnt/disk2/data/docker
+#      file:
+#        src: /mnt/disk2/data/docker
+#        dest: /home/{{ ansible_user_id }}/.local/share/docker
+#        state: link        
