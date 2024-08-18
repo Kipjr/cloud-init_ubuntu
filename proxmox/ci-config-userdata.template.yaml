@@ -1,7 +1,7 @@
 #cloud-config
 hostname: ${CI_HOSTNAME}
 fqdn: ${CI_HOSTNAME}.${CI_SEARCH_DOMAIN}
-manage_etc_hosts: True
+manage_etc_hosts: true
 
 users:
   - name: ${CI_USER}
