@@ -1,74 +1,74 @@
 ---
 
-    - name: Download the Microsoft repository key file
-      ansible.builtin.get_url:
-        url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
-        dest: "/tmp/packages-microsoft-prod.deb"
-        mode: "0644"
+- name: Download the Microsoft repository key file
+  ansible.builtin.get_url:
+    url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
+    dest: "/tmp/packages-microsoft-prod.deb"
+    mode: "0644"
 
-    - name: Register the Microsoft repository key
-      become: true
-      ansible.builtin.apt:
-        deb: "/tmp/packages-microsoft-prod.deb"
+- name: Register the Microsoft repository key
+  become: true
+  ansible.builtin.apt:
+    deb: "/tmp/packages-microsoft-prod.deb"
 
-    - name: Remove the Microsoft repository key file
-      ansible.builtin.file:
-        path: "/tmp/packages-microsoft-prod.deb"
-        state: absent
+- name: Remove the Microsoft repository key file
+  ansible.builtin.file:
+    path: "/tmp/packages-microsoft-prod.deb"
+    state: absent
 
-    - name: Add Microsoft APT repository
-      become: true
-      ansible.builtin.apt_repository:
-        repo: "deb https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
-        state: present
+- name: Add Microsoft APT repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
+    state: present
 
-    - name: Ensure all packages are up to date
-      become: true
-      ansible.builtin.apt:
-        update_cache: true
-        upgrade: full
+- name: Ensure all packages are up to date
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: full
 
-    - name: Install required packages
-      become: true
-      ansible.builtin.apt:
-        name:
-          - ufw
-          - ethtool
-          - htop
-          - lshw
-          - screen
-          - nano
-          - net-tools
-          - dnsutils
-          - openssl
-          - build-essential
-          - p7zip-full
-          - hw-probe
-          - snmpd
-          - snmp-mibs-downloader
-          - curl
-          - gnupg
-          - apt-transport-https
-          - ca-certificates
-          - libssl-dev
-          - software-properties-common
-          - openssh-server
-          - uidmap
-          - dbus-user-session
-          - unattended-upgrades
-          - pkg-config
-        state: present
+- name: Install required packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - ufw
+      - ethtool
+      - htop
+      - lshw
+      - screen
+      - nano
+      - net-tools
+      - dnsutils
+      - openssl
+      - build-essential
+      - p7zip-full
+      - hw-probe
+      - snmpd
+      - snmp-mibs-downloader
+      - curl
+      - gnupg
+      - apt-transport-https
+      - ca-certificates
+      - libssl-dev
+      - software-properties-common
+      - openssh-server
+      - uidmap
+      - dbus-user-session
+      - unattended-upgrades
+      - pkg-config
+    state: present
 
-    - name: Install PowerShell Core
-      become: true
-      ansible.builtin.apt:
-        name: powershell
-        state: present
+- name: Install PowerShell Core
+  become: true
+  ansible.builtin.apt:
+    name: powershell
+    state: present
 
-    - name: Configure Webmin repository and install Webmin
-      become: true
-      ansible.builtin.shell: |
-        curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
-        sh setup-repos.sh -f
-        apt-get update
-        apt-get install -y webmin --install-recommends
+- name: Configure Webmin repository and install Webmin
+  become: true
+  ansible.builtin.shell: |
+    curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
+    sh setup-repos.sh -f
+    apt-get update
+    apt-get install -y webmin --install-recommends
