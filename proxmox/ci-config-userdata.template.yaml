@@ -29,3 +29,5 @@ ansible:
   pull:
     url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
     playbook_name: site.yml
+    clean: true
+    full: true
