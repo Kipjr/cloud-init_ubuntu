@@ -17,10 +17,9 @@ if ($UUID -eq 0) {
     exit
 }
 
-sudo apt-get update -y
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository --yes --update ppa:ansible/ansible
-sudo apt-get install -y ansible git
+Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile "get-pip.py"
+python3 get-pip.py --user
+python3 -m pip install --user ansible
 
 # Create working directory and clone the repository
 if (-not (Test-Path -Path $WorkingDir)) {
