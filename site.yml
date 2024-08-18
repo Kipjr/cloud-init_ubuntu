@@ -163,6 +163,18 @@
       timezone:
         name: Europe/Amsterdam
 
+    - name: Ensure the system timezone is up-to-date
+      become: yes
+      apt:
+        name: tzdata
+        state: latest
+
+    - name: Restart the systemd-timedated service
+      become: yes
+      service:
+        name: systemd-timedated
+        state: restarted
+
     - name: Setup unattended upgrades
       become: yes
       apt:
