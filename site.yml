@@ -1,7 +1,7 @@
 - name: Configure and setup the server
   hosts: localhost
   become: yes
-  gather_facts: yes  # Ensure facts are gathered
+  gather_facts: True  # Ensure facts are gathered
 
   vars:
     default_user: "{{ lookup('env', 'USER') | default('ansible') }}"
