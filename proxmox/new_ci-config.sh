@@ -1,24 +1,23 @@
 #!/bin/bash
 
+# Create a temporary environment file with exported variables
+temp_env=$(mktemp)
+
 cd $(dirname $0)
 
 # copy template
-cp -v "env.example" "env"
+cp "env.example" $temp_env
 
 # edit env
-vi "env"
+nano $temp_env
 
-# Setting temporary Env vars
-export $(grep -v '^#' env | xargs)
+sed -i 's/^/export /g' $temp_env
 
-# filling template and export to yaml
-envsubst < ci-config-userdata.template.yaml > ci-config-userdata.yaml
+# Use the temporary environment file to perform envsubst
+(source $temp_env && envsubst < ci-config-userdata.template.yaml > test.txt)
 
-#Removing temporary Env vars
-unset $(grep -v '^#' .env | xargs)
-
-#Remove env
-rm -vi "./env"
+# Clean up temporary environment file
+/bin/rm $temp_env
 
 cat <<EOF
 Move 'ci-config-userdata.yaml' to Proxmox Snippets [local:snippets]
