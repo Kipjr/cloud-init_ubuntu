@@ -72,7 +72,7 @@
 
 - name: Configure Webmin repository and install Webmin
   become: true
-  when: dir_check_webmin.stat.exists
+  when: not dir_check_webmin.stat.exists
   ansible.builtin.shell: |
     curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
     sh setup-repos.sh -f
