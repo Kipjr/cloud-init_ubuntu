@@ -219,11 +219,11 @@
 #        dest: /home/{{ ansible_user_id }}/.local/share/docker
 #        state: link
           
-    - name: Apply CIS-remediation
-      hosts: localhost
-      become: yes
-      roles:
-        - role: UBUNTU22-CIS
-          when:
-            - ansible_os_family == 'UBUNTU'
-            - ansible_distribution_major_version is version('22', '=')
+- name: Apply CIS-remediation
+  hosts: localhost
+  become: yes
+  roles:
+    - role: UBUNTU22-CIS
+      when:
+        - ansible_os_family == 'UBUNTU'
+        - ansible_distribution_major_version is version('22', '=')
