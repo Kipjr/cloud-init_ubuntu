@@ -1,33 +1,34 @@
+---
     - name: Download the Microsoft repository key file
       get_url:
         url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
         dest: "/tmp/packages-microsoft-prod.deb"
 
     - name: Register the Microsoft repository key
-      become: yes
-      apt:
+      become: true
+      ansible.builtin.apt:
         deb: "/tmp/packages-microsoft-prod.deb"
 
     - name: Remove the Microsoft repository key file
-      file:
+      ansible.builtin.file:
         path: "/tmp/packages-microsoft-prod.deb"
         state: absent
 
     - name: Add Microsoft APT repository
-      become: yes
-      apt_repository:
-        repo: "deb [arch={{ ansible_architecture }}] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
+      become: true
+      ansible.builtin.apt_repository:
+        repo: "deb https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
         state: present
 
     - name: Ensure all packages are up to date
-      become: yes
-      apt:
-        update_cache: yes
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
         upgrade: full
 
     - name: Install required packages
-      become: yes
-      apt:
+      become: true
+      ansible.builtin.apt:
         name:
           - ufw
           - ethtool
@@ -57,13 +58,13 @@
         state: present
 
     - name: Install PowerShell Core
-      become: yes
-      apt:
+      become: true
+      ansible.builtin.apt:
         name: powershell
         state: present
 
     - name: Configure Webmin repository and install Webmin
-      become: yes
+      become: true
       shell: |
         curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
         sh setup-repos.sh -f
