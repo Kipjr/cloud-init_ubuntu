@@ -33,7 +33,20 @@
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
-    
+        
+    - name: Add Microsoft APT repository
+      become: yes
+      apt_repository:
+        repo: "deb [arch={{ ansible_architecture }}] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
+        state: present
+        
+    - name: Add Docker repository
+      become: yes
+      apt_repository:
+        repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        filename: docker
+        state: present
+        
     - name: Ensure all packages are up to date
       become: yes
       apt:
@@ -68,13 +81,7 @@
           - uidmap
           - dbus-user-session
         state: present
-        
-    - name: Add Microsoft APT repository
-      become: yes
-      apt_repository:
-        repo: "deb [arch={{ ansible_architecture }}] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
-        state: present
-    
+
     - name: Install PowerShell Core
       become: yes
       apt:
@@ -88,13 +95,6 @@
         sh setup-repos.sh -f
         apt-get update
         apt-get install -y webmin --install-recommends
-
-    - name: Add Docker repository
-      become: yes
-      apt_repository:
-        repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-        filename: docker
-        state: present
 
     - name: Install Docker packages
       become: yes
