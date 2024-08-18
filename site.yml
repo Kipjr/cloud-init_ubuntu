@@ -1,17 +1,13 @@
 - name: Configure and setup the server
   hosts: localhost
   become: yes
-  gather_facts: True  # Ensure facts are gathered
-
-  vars:
-    default_user: "{{ lookup('env', 'USER') | default('ansible') }}"
-    default_fqdn: "{{ ansible_hostname }}{% if ansible_domain %}.{{ ansible_domain }}{% endif %}"
+  gather_facts: yes  # Ensure facts are gathered
 
   vars_prompt:
     - name: ansible_user
       prompt: "Enter the username"
       private: no
-      default: "{{ default_user }}"  # Fallback to default_user if not provided
+      default: "{{ lookup('env', 'USER') | default('ansible') }}"  # Fallback to default_user if not provided
 
     - name: fqdn
       prompt: "Enter the host FQDN"
@@ -19,6 +15,10 @@
       default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
 
   tasks:
+    - name: Set default_fqdn
+      set_fact:
+        default_fqdn: "{{ ansible_hostname }}{% if ansible_domain %}.{{ ansible_domain }}{% endif %}"
+
 
     - name: Install roles and collections
       community.general.ansible_galaxy_install:
