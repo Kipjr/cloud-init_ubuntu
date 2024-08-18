@@ -1,61 +1,61 @@
 ---
 
-    - name: Set the machine FQDN
-      become: true
-      ansible.builtin.hostname:
-        name: "{{ ansible_fqdn }}"
+- name: Set the machine FQDN
+  become: true
+  ansible.builtin.hostname:
+    name: "{{ ansible_fqdn }}"
 
-    - name: Set timezone to Europe/Amsterdam
-      become: true
-      community.general.timezone:
-        name: Europe/Amsterdam
+- name: Set timezone to Europe/Amsterdam
+  become: true
+  community.general.timezone:
+    name: Europe/Amsterdam
 
-    - name: Restart the systemd-timedated service
-      become: true
-      ansible.builtin.service:
-        name: systemd-timedated
-        state: restarted
+- name: Restart the systemd-timedated service
+  become: true
+  ansible.builtin.service:
+    name: systemd-timedated
+    state: restarted
 
-    - name: Enable unattended upgrades
-      become: true
-      ansible.builtin.copy:
-        dest: /etc/apt/apt.conf.d/20auto-upgrades
-        mode: "0644"
-        content: |
-          APT::Periodic::Update-Package-Lists "1";
-          APT::Periodic::Unattended-Upgrade "1";
+- name: Enable unattended upgrades
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    mode: "0644"
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
 
-    - name: Generate SSH private key for user
-      ansible.builtin.user:
-        name: "{{ ansible_user_id }}"
-        generate_ssh_key: true
+- name: Generate SSH private key for user
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    generate_ssh_key: true
 
-    - name: Add SSH public key to authorized_keys
-      ansible.posix.authorized_key:
-        user: "{{ ansible_user_id }}"
-        key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
+- name: Add SSH public key to authorized_keys
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user_id }}"
+    key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
 
-    - name: Disable SSH password authentication
-      become: true
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PasswordAuthentication'
-        line: 'PasswordAuthentication no'
-        state: present
+- name: Disable SSH password authentication
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    state: present
 
-    - name: Enable SSH key-based login
-      become: true
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PubkeyAuthentication'
-        line: 'PubkeyAuthentication yes'
-        state: present
+- name: Enable SSH key-based login
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+    state: present
 
-    - name: Restart SSH service
-      become: true
-      ansible.builtin.service:
-        name: ssh
-        state: restarted
+- name: Restart SSH service
+  become: true
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
 
 #    - name: Configure additional partition as xfs
 #      filesystem:
