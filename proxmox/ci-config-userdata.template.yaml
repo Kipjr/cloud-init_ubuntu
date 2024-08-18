@@ -28,4 +28,4 @@ ansible:
   install_method: distro
   pull:
     url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
-    playbook_name: site.yaml
+    playbook_name: site.yml
