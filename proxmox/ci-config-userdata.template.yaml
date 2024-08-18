@@ -28,13 +28,3 @@ ansible:
   pull:
     url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
     playbook_name: site.yaml
-
-# Documentation on data sources configuration options
-datasource:
-  NoCloud:
-    seedfrom: ${CI_GITHUB_SEEDFROM}
-    fs_label: cidata
-    user-data: |
-    meta-data:
-      instance-id: i-87018aed
-      local-hostname: myhost.internal
