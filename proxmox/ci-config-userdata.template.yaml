@@ -1,0 +1,40 @@
+#cloud-config
+hostname: ${HOSTNAME}
+fqdn: ${HOSTNAME}.${SEARCH_DOMAIN}
+manage_etc_hosts: True
+
+users:
+  - default
+  - name: ${CI_USER}
+    plain_text_passwd: ${CI_PASSWORD}
+    groups: [adm,sudo]
+    lock-passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+chpasswd:
+  expire: False
+ssh_pwauth: True
+ssh_authorized_keys:
+  - ${CI_SSH_AUTH_KEY}
+
+package_update: true
+package_upgrade: true
+packages:
+  - apt-transport-https
+  - software-properties-common
+  - git
+ansible:
+  install_method: distro
+  pull:
+    url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
+    playbook_name: site.yaml
+
+# Documentation on data sources configuration options
+datasource:
+  NoCloud:
+    seedfrom: ${CI_GITHUB_SEEDFROM}
+    fs_label: cidata
+    user-data: |
+    meta-data:
+      instance-id: i-87018aed
+      local-hostname: myhost.internal
