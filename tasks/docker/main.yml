@@ -1,4 +1,5 @@
 ---
+
     - name: Add Docker official GPG key
       become: true
       ansible.builtin.apt_key:
@@ -7,7 +8,7 @@
 
     - name: Add Docker repository
       become: true
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         filename: docker
         state: present
@@ -30,7 +31,7 @@
         state: present
 
     - name: Install Docker (rootless)
-      shell: |
+      ansible.builtin.shell: |
         systemctl disable --now docker.service docker.socket
         rm /var/run/docker.sock
         dockerd-rootless-setuptool.sh install
@@ -41,13 +42,14 @@
         loginctl enable-linger {{ ansible_user_id }}
 
     - name: Ensure the directory for Portainer exists
-      file:
+      ansible.builtin.file:
         path: /home/{{ ansible_user_id }}/docker/portainer
         state: directory
         mode: '0750'
 
     - name: Configure Portainer with Docker Compose
-      copy:
+      mode: "0640"
+      ansible.builtin.copy:
         dest: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
         content: |
           services:
