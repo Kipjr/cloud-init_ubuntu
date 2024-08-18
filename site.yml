@@ -13,10 +13,26 @@
       hostname:
         name: "{{ ansible_fqdn }}"
         
-    - name: Set timezone to Europe/Amsterdam
+    - name: Download the Microsoft repository key file
+      get_url:
+        url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
+        dest: "/tmp/packages-microsoft-prod.deb"
+
+    - name: Register the Microsoft repository key
       become: yes
-      timezone:
-        name: Europe/Amsterdam
+      apt:
+        deb: "/tmp/packages-microsoft-prod.deb"
+
+    - name: Remove the Microsoft repository key file
+      file:
+        path: "/tmp/packages-microsoft-prod.deb"
+        state: absent
+    
+    - name: Add Docker official GPG key
+      become: yes
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
     
     - name: Ensure all packages are up to date
       become: yes
@@ -52,21 +68,6 @@
           - uidmap
           - dbus-user-session
         state: present
-
-    - name: Download the Microsoft repository key file
-      get_url:
-        url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
-        dest: "/tmp/packages-microsoft-prod.deb"
-
-    - name: Register the Microsoft repository key
-      become: yes
-      apt:
-        deb: "/tmp/packages-microsoft-prod.deb"
-
-    - name: Remove the Microsoft repository key file
-      file:
-        path: "/tmp/packages-microsoft-prod.deb"
-        state: absent
         
     - name: Add Microsoft APT repository
       become: yes
@@ -87,12 +88,6 @@
         sh setup-repos.sh -f
         apt-get update
         apt-get install -y webmin --install-recommends
-    
-    - name: Add Docker official GPG key
-      become: yes
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
 
     - name: Add Docker repository
       become: yes
@@ -156,7 +151,11 @@
             portainer_data:
         owner: "{{ ansible_user_uid }}"
         group: "{{ ansible_user_gid }}"
-
+    
+    - name: Set timezone to Europe/Amsterdam
+      become: yes
+      timezone:
+        name: Europe/Amsterdam
 
     - name: Setup unattended upgrades
       become: yes
