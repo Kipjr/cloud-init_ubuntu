@@ -14,10 +14,9 @@ PLAYBOOK_NAME="${2:-playbook.yml}"
 WORKING_DIR="${3:-/tmp/ansible}"
 ANSIBLE_ARG="${4}"
 
-sudo apt-get update -y
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository --yes --update ppa:ansible/ansible
-sudo apt-get install -y ansible git
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py --user
+python3 -m pip install --user ansible
 
 mkdir -p "${WORKING_DIR}" && cd "${WORKING_DIR}"
 git clone "${GITHUB_REPO_URL}" git_repo && cd ./git_repo
