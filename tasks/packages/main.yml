@@ -1,9 +1,10 @@
 ---
+
     - name: Download the Microsoft repository key file
       ansible.builtin.get_url:
         url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
         dest: "/tmp/packages-microsoft-prod.deb"
-        mode: 0644
+        mode: "0644"
 
     - name: Register the Microsoft repository key
       become: true
@@ -66,7 +67,7 @@
 
     - name: Configure Webmin repository and install Webmin
       become: true
-      shell: |
+      ansible.builtin.shell: |
         curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
         sh setup-repos.sh -f
         apt-get update
