@@ -2,6 +2,9 @@
 collections:
   - name: community.docker
     type: galaxy
-  - name: git+https://github.com/ansible-lockdown/UBUNTU22-CIS.git
-    type: git
+
+roles:
+ -  name: ansible-lockdown/UBUNTU22-CIS
+    src: https://github.com/ansible-lockdown/UBUNTU22-CIS.git
     version: main
+    scm: git
