@@ -7,7 +7,6 @@
 
     - name: Set timezone to Europe/Amsterdam
       become: true
-      become_method: sudo
       community.general.timezone:
         name: Europe/Amsterdam
 
@@ -21,7 +20,7 @@
       become: true
       ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/20auto-upgrades
-        mode: 0644
+        mode: "0644"
         content: |
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Unattended-Upgrade "1";
@@ -74,4 +73,4 @@
 #      file:
 #        src: /mnt/disk2/data/docker
 #        dest: /home/{{ ansible_user_id }}/.local/share/docker
-#        state: link        
+#        state: link
