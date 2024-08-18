@@ -4,6 +4,8 @@
 
   tasks:
     - name: Install roles and collections
+      environment:
+        PATH: "{{ lookup('env', 'HOME') }}/.local/bin:{{ ansible_env.PATH }}"    
       community.general.ansible_galaxy_install:
         type: both
         requirements_file: ./collections/requirements.yml
