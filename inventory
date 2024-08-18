@@ -1,7 +1,5 @@
 # inventory
 all:
-  children:
-    ungrouped:
-      hosts:
-        localhost:
-          ansible_connection=local
+  hosts:
+    localhost:
+      ansible_connection: local
