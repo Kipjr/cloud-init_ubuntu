@@ -64,7 +64,7 @@
   ansible.builtin.apt:
     name: powershell
     state: present
-    
+
 - name: Check if Webmin is installed
   ansible.builtin.stat:
     path: /etc/webmin
