@@ -31,6 +31,7 @@ Set-Location -Path "$WorkingDir/git_repo"
 
 # Check if the playbook file exists and run it
 if (Test-Path -Path $PlaybookName) {
+    ansible-galaxy install -r collections/requirements.yml
     ansible-playbook "$AnsibleArg" $PlaybookName
 } else {
     Write-Output "Playbook $PlaybookName does not exist."
