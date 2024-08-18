@@ -18,6 +18,11 @@
       default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
 
   tasks:
+    - name: Install roles and collections
+      community.general.ansible_galaxy_install:
+        type: both
+        requirements_file: ./collections/requirements.yml
+        
     - name: Set the machine FQDN
       hostname:
         name: "{{ fqdn }}"
