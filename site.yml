@@ -80,6 +80,7 @@
           - openssh-server
           - uidmap
           - dbus-user-session
+          - unattended-upgrades
         state: present
 
     - name: Install PowerShell Core
@@ -175,12 +176,6 @@
       service:
         name: systemd-timedated
         state: restarted
-
-    - name: Setup unattended upgrades
-      become: yes
-      apt:
-        name: unattended-upgrades
-        state: present
 
     - name: Enable unattended upgrades
       become: yes
