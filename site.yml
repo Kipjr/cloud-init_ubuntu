@@ -52,6 +52,20 @@
           - uidmap
           - dbus-user-session
         state: present
+
+    - name: Download the Microsoft repository key file
+      get_url:
+        url: "https://packages.microsoft.com/config/ubuntu/{{ ansible_lsb.release }}/packages-microsoft-prod.deb"
+        dest: "/tmp/packages-microsoft-prod.deb"
+
+    - name: Register the Microsoft repository key
+      apt:
+        deb: "/tmp/packages-microsoft-prod.deb"
+
+    - name: Remove the Microsoft repository key file
+      file:
+        path: "/tmp/packages-microsoft-prod.deb"
+        state: absent
         
     - name: Add Microsoft APT repository
       become: yes
@@ -65,37 +79,13 @@
         name: powershell
         state: present
 
-    - name: Generate SSH private key for user
-      user:
-        name: "{{ ansible_user_id }}"
-        generate_ssh_key: yes
-    
-    - name: Add SSH public key to authorized_keys
-      authorized_key:
-        user: "{{ ansible_user_id }}"
-        key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
-
-    - name: Disable SSH password authentication
+    - name: Configure Webmin repository and install Webmin
       become: yes
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PasswordAuthentication'
-        line: 'PasswordAuthentication no'
-        state: present
-    
-    - name: Enable SSH key-based login
-      become: yes
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PubkeyAuthentication'
-        line: 'PubkeyAuthentication yes'
-        state: present
-    
-    - name: Restart SSH service
-      become: yes
-      service:
-        name: ssh
-        state: restarted
+      shell: |
+        curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
+        sh setup-repos.sh -f
+        apt-get update
+        apt-get install -y webmin --install-recommends
     
     - name: Add Docker official GPG key
       become: yes
@@ -133,49 +123,10 @@
         systemctl --user enable docker
         loginctl enable-linger {{ ansible_user_id }}
 
-    - name: Setup unattended upgrades
-      become: yes
-      apt:
-        name: unattended-upgrades
-        state: present
-
-    - name: Enable unattended upgrades
-      become: yes
-      shell: |
-        dpkg-reconfigure --priority=low unattended-upgrades
-        sed -i 's/\/\/\s*"\${distro_id}:\${distro_codename}-updates";/"\${distro_id}:\${distro_codename}-updates";/' /etc/apt/apt.conf.d/50unattended-upgrades
-
-#    - name: Configure additional partition as xfs
-#      filesystem:
-#        fstype: xfs
-#        dev: /dev/sdb1  # Replace with your actual partition
-
- #   - name: Mount the partition to /mnt/disk2
- #     mount:
- #       path: /mnt/disk2
- #       src: /dev/sdb1
- #       fstype: xfs
- #       state: mounted
-
-#    - name: Symlink ~/.local/share/docker to /mnt/disk2/data/docker
-#      file:
-#        src: /mnt/disk2/data/docker
-#        dest: /home/{{ ansible_user_id }}/.local/share/docker
-#        state: link
-
-    - name: Configure Webmin repository and install Webmin
-      become: yes
-      shell: |
-        curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
-        sh setup-repos.sh -f
-        apt-get update
-        apt-get install -y webmin --install-recommends
-
     - name: Configure Portainer with Docker Compose
       copy:
         dest: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
         content: |
-          version: '3'
           services:
             portainer:
               image: portainer/portainer-ee:latest
@@ -188,7 +139,6 @@
                 - portainer_data:/data
               ports:
                 - "9000:9000"
-
             portainer_agent:
               image: portainer/portainer-agent:latest
               container_name: portainer_agent
@@ -206,11 +156,74 @@
         owner: "{{ ansible_user_uid }}"
         group: "{{ ansible_user_gid }}"
 
-- name: Apply CIS-remediation
-  hosts: localhost
-  become: yes
-  roles:
-    - role: UBUNTU22-CIS
-      when:
-        - ansible_os_family == 'UBUNTU'
-        - ansible_distribution_major_version is version('22', '=')
+
+    - name: Setup unattended upgrades
+      become: yes
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable unattended upgrades
+      become: yes
+      shell: |
+        dpkg-reconfigure --priority=low unattended-upgrades
+        sed -i 's/\/\/\s*"\${distro_id}:\${distro_codename}-updates";/"\${distro_id}:\${distro_codename}-updates";/' /etc/apt/apt.conf.d/50unattended-upgrades
+
+    - name: Generate SSH private key for user
+      user:
+        name: "{{ ansible_user_id }}"
+        generate_ssh_key: yes
+    
+    - name: Add SSH public key to authorized_keys
+      authorized_key:
+        user: "{{ ansible_user_id }}"
+        key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
+
+    - name: Disable SSH password authentication
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+    
+    - name: Enable SSH key-based login
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PubkeyAuthentication'
+        line: 'PubkeyAuthentication yes'
+        state: present
+    
+    - name: Restart SSH service
+      become: yes
+      service:
+        name: ssh
+        state: restarted
+        
+#    - name: Configure additional partition as xfs
+#      filesystem:
+#        fstype: xfs
+#        dev: /dev/sdb1  # Replace with your actual partition
+
+ #   - name: Mount the partition to /mnt/disk2
+ #     mount:
+ #       path: /mnt/disk2
+ #       src: /dev/sdb1
+ #       fstype: xfs
+ #       state: mounted
+
+#    - name: Symlink ~/.local/share/docker to /mnt/disk2/data/docker
+#      file:
+#        src: /mnt/disk2/data/docker
+#        dest: /home/{{ ansible_user_id }}/.local/share/docker
+#        state: link
+          
+    - name: Apply CIS-remediation
+      hosts: localhost
+      become: yes
+      roles:
+        - role: UBUNTU22-CIS
+          when:
+            - ansible_os_family == 'UBUNTU'
+            - ansible_distribution_major_version is version('22', '=')
