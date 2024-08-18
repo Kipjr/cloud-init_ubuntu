@@ -1,6 +1,5 @@
 - name: Configure and setup the server
   hosts: localhost
-  become: yes
   gather_facts: yes  # Ensure facts are gathered
 
   tasks:
@@ -10,10 +9,12 @@
         requirements_file: ./collections/requirements.yml
         
     - name: Set the machine FQDN
+      become: yes
       hostname:
         name: "{{ ansible_fqdn }}"
         
     - name: Set timezone to Europe/Amsterdam
+      become: yes
       timezone:
         name: Europe/Amsterdam
     
@@ -23,6 +24,7 @@
         upgrade: full
 
     - name: Install required packages
+      become: yes
       apt:
         name:
           - ufw
@@ -52,11 +54,13 @@
         state: present
         
     - name: Add Microsoft APT repository
+      become: yes
       apt_repository:
         repo: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main"
         state: present
     
     - name: Install PowerShell Core
+      become: yes
       apt:
         name: powershell
         state: present
@@ -72,6 +76,7 @@
         key: "{{ lookup('file', '/home/{{ ansible_user_id }}/.ssh/id_rsa.pub') }}"
 
     - name: Disable SSH password authentication
+      become: yes
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PasswordAuthentication'
@@ -79,6 +84,7 @@
         state: present
     
     - name: Enable SSH key-based login
+      become: yes
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PubkeyAuthentication'
@@ -86,22 +92,26 @@
         state: present
     
     - name: Restart SSH service
+      become: yes
       service:
         name: ssh
         state: restarted
     
     - name: Add Docker official GPG key
+      become: yes
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
     - name: Add Docker repository
+      become: yes
       apt_repository:
         repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         filename: docker
         state: present
 
     - name: Install Docker packages
+      become: yes
       apt:
         name:
           - docker-ce
@@ -123,11 +133,13 @@
         loginctl enable-linger {{ ansible_user_id }}
 
     - name: Setup unattended upgrades
+      become: yes
       apt:
         name: unattended-upgrades
         state: present
 
     - name: Enable unattended upgrades
+      become: yes
       shell: |
         dpkg-reconfigure --priority=low unattended-upgrades
         sed -i 's/\/\/\s*"\${distro_id}:\${distro_codename}-updates";/"\${distro_id}:\${distro_codename}-updates";/' /etc/apt/apt.conf.d/50unattended-upgrades
@@ -151,6 +163,7 @@
 #        state: link
 
     - name: Configure Webmin repository and install Webmin
+      become: yes
       shell: |
         curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
         sh setup-repos.sh -f
