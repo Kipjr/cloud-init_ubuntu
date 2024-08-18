@@ -1,6 +1,4 @@
 ---
 collections:
-  - ansible.builtin
-  - community.general
-  - community.ansible
-  - community.docker
+  - name: community.docker
+    type: galaxy
