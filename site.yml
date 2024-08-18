@@ -59,6 +59,7 @@
         dest: "/tmp/packages-microsoft-prod.deb"
 
     - name: Register the Microsoft repository key
+      become: yes
       apt:
         deb: "/tmp/packages-microsoft-prod.deb"
 
