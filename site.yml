@@ -179,9 +179,11 @@
 
     - name: Enable unattended upgrades
       become: yes
-      shell: |
-        dpkg-reconfigure --priority=low unattended-upgrades
-        sed -i 's/\/\/\s*"\${distro_id}:\${distro_codename}-updates";/"\${distro_id}:\${distro_codename}-updates";/' /etc/apt/apt.conf.d/50unattended-upgrades
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
 
     - name: Generate SSH private key for user
       user:
