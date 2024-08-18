@@ -1,26 +1,24 @@
 - name: Configure and setup the server
   hosts: localhost
   become: yes
+  gather_facts: yes  # Ensure facts are gathered
+
+  vars:
+    default_user: "{{ lookup('env', 'USER') | default('ansible') }}"
+    default_fqdn: "{{ ansible_hostname }}{% if ansible_domain %}.{{ ansible_domain }}{% endif %}"
+
+  vars_prompt:
+    - name: ansible_user
+      prompt: "Enter the username"
+      private: no
+      default: "{{ default_user }}"  # Fallback to default_user if not provided
+
+    - name: fqdn
+      prompt: "Enter the host FQDN"
+      private: no
+      default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
 
   tasks:
-    - name: Gather facts
-      setup:
-
-    - name: Set default FQDN
-      set_fact:
-        default_fqdn: "{{ ansible_hostname }}{% if ansible_domain %}.{{ ansible_domain }}{% endif %}"
-
-    - name: Prompt for user and host FQDN
-      vars_prompt:
-        - name: ansible_user
-          prompt: "Enter the username"
-          private: no
-          default: "{{ lookup('env', 'USER') | default('ansible') }}"  # Fallback to the logged-in user, or 'ansible' if not found
-
-        - name: fqdn
-          prompt: "Enter the host FQDN"
-          private: no
-          default: "{{ default_fqdn }}"  # Fallback to default_fqdn if not provided
 
     - name: Install roles and collections
       community.general.ansible_galaxy_install:
