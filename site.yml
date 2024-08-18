@@ -81,6 +81,7 @@
           - uidmap
           - dbus-user-session
           - unattended-upgrades
+          - pkg-config
         state: present
 
     - name: Install PowerShell Core
