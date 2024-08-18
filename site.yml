@@ -114,7 +114,7 @@
         rm /var/run/docker.sock
         dockerd-rootless-setuptool.sh install
         echo 'export PATH=/usr/bin:$PATH' >> /home/{{ ansible_user_id }}/.bashrc
-        echo "export DOCKER_HOST=unix:///run/user/{{ ansible_uid }}/docker.sock" >> /home/{{ ansible_user_id }}/.bashrc
+        echo "export DOCKER_HOST=unix:///run/user/{{ ansible_user_uid }}/docker.sock" >> /home/{{ ansible_user_id }}/.bashrc
         systemctl --user start docker
         systemctl --user enable docker
         loginctl enable-linger {{ ansible_user_id }}
@@ -143,7 +143,7 @@
                 - no-new-privileges:true
               volumes:
                 - /etc/localtime:/etc/localtime:ro
-                - /run/user/{{ ansible_uid }}/docker.sock:/var/run/docker.sock
+                - /run/user/{{ ansible_user_uid }}/docker.sock:/var/run/docker.sock
                 - /home/{{ ansible_user_id }}/.local/share/docker/volumes:/var/lib/docker/volumes
               ports:
                 - "9001:9001"
