@@ -31,7 +31,7 @@
   when: not dir_check_webmin.stat.exists
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
-    dest: /tmp/setup-repos.sh 
+    dest: /tmp/setup-repos.sh
     mode: '0740'
 
 - name: Configure Webmin repository
