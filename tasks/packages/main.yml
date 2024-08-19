@@ -38,7 +38,7 @@
   become: true
   when: not dir_check_webmin.stat.exists
   ansible.builtin.shell: |
-    sh setup-repos.sh -f
+    sh /tmp/setup-repos.sh -f
 
 - name: Ensure all packages are up to date
   become: true
