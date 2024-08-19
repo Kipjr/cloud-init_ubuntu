@@ -22,6 +22,24 @@
     repo: "deb https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
     state: present
 
+- name: Check if Webmin is installed
+  ansible.builtin.stat:
+    path: /etc/webmin
+  register: dir_check_webmin
+
+- name: Download Webmin
+  when: not dir_check_webmin.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
+    dest: /tmp/setup-repos.sh 
+    mode: '0740'
+
+- name: Configure Webmin repository
+  become: true
+  when: not dir_check_webmin.stat.exists
+  ansible.builtin.shell: |
+    sh setup-repos.sh -f
+
 - name: Ensure all packages are up to date
   become: true
   ansible.builtin.apt:
@@ -57,24 +75,6 @@
       - dbus-user-session
       - unattended-upgrades
       - pkg-config
+      - powershell
+      - webmin
     state: present
-
-- name: Install PowerShell Core
-  become: true
-  ansible.builtin.apt:
-    name: powershell
-    state: present
-
-- name: Check if Webmin is installed
-  ansible.builtin.stat:
-    path: /etc/webmin
-  register: dir_check_webmin
-
-- name: Configure Webmin repository and install Webmin
-  become: true
-  when: not dir_check_webmin.stat.exists
-  ansible.builtin.shell: |
-    curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
-    sh setup-repos.sh -f
-    apt-get update
-    apt-get install -y webmin --install-recommends
