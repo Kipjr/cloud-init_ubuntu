@@ -47,6 +47,34 @@
     systemctl --user enable docker
     loginctl enable-linger {{ ansible_user_id }}
 
+- name: Configure Docker Daemon.json
+  mode: "0644"
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "iptables": true,
+        "bip": "10.249.0.1/24"
+        "default-address-pools":[
+          {"base":"10.249.1.0/24","size":28}
+        ]
+      }
+
+- name: Ensure the user directory docker service exists
+  ansible.builtin.file:
+    path: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d
+    state: directory
+    mode: '0755'
+
+- name: Configure Docker Daemon.json
+  mode: "0644"
+  ansible.builtin.copy:
+    dest: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d/override.conf
+    content: |
+      [Service]
+      Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false"
+      Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET="slirp4netns --cidr=10.249.0.0/24"
+
 - name: Ensure the directory for Portainer exists
   ansible.builtin.file:
     path: /home/{{ ansible_user_id }}/docker/portainer
@@ -86,3 +114,14 @@
         portainer_data:
     owner: "{{ ansible_user_uid }}"
     group: "{{ ansible_user_gid }}"
+
+- name: Run the Docker service
+  ansible.builtin.systemd_service:
+    name: docker
+    state: reloaded
+    scope: user
+
+- name: Start Docker Portainer
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user_id }}/docker/portainer
+    state: present
