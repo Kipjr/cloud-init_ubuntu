@@ -35,15 +35,25 @@
     path: /run/user/{{ ansible_user_uid }}/docker.sock
   register: file_check_docker_rootless
 
+- name: Disable Docker.service
+  ansible.builtin.systemd_service:
+    name: docker.service
+    masked: true
+    enabled: false
+
+- name: Disable Docker.socket
+  ansible.builtin.systemd_service:
+    name: docker.socket
+    masked: true
+    enabled: false
+
 - name: Install Docker (rootless)
   when: not file_check_docker_rootless.stat.exists
   ansible.builtin.shell: |
-    systemctl disable --now docker.service docker.socket
     rm /var/run/docker.sock
     dockerd-rootless-setuptool.sh install
     echo 'export PATH=/usr/bin:$PATH' >> /home/{{ ansible_user_id }}/.bashrc
     echo "export DOCKER_HOST=unix:///run/user/{{ ansible_user_uid }}/docker.sock" >> /home/{{ ansible_user_id }}/.bashrc
-    systemctl --user enable docker
     loginctl enable-linger {{ ansible_user_id }}
 
 - name: Configure Docker Daemon.json
@@ -117,6 +127,7 @@
 - name: Run the Docker service
   ansible.builtin.systemd_service:
     name: docker
+    enabled: true
     state: reloaded
     scope: user
 
