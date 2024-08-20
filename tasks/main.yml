@@ -1,16 +1,13 @@
 ---
-- hosts: all
-  become: true
 
-  tasks:
-    - name: Packages
-      import_tasks: packages/main.yml
+- name: Packages
+  import_tasks: packages/main.yml
 
-    - name: Docker
-      import_tasks: docker/main.yml
+- name: Docker
+  import_tasks: docker/main.yml
 
-    - name: Configuration
-      import_tasks: configuration/main.yml
+- name: Configuration
+  import_tasks: configuration/main.yml
 
-    - name: Security
-      import_tasks: security/main.yml
+- name: Security
+  import_tasks: security/main.yml
