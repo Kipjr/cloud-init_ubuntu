@@ -26,6 +26,10 @@ packages:
 ansible:
   package_name: ansible
   install_method: pip
+  galaxy:
+    actions:
+      - [ "collection", "install", "community.general" ]
+      - [ "collection", "install", "community.docker" ]
   pull:
     url: ${CI_GITHUB_ANSIBLE_PLAYBOOK}
     playbook_name: site.yml
