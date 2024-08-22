@@ -1,7 +1,6 @@
 ---
 - name: Apply CIS-remediation
-  include_playbook: site.yml
-  file: /home/{{ ansible_user_id }}/.ansible/roles/ubuntu22-cis
+  file: /home/{{ ansible_user_id }}/.ansible/roles/ubuntu22-cis/site.yml
   become: yes
   become_user: root   
   vars:
