@@ -57,9 +57,9 @@
     loginctl enable-linger {{ ansible_user_id }}
 
 - name: Configure Docker Daemon.json
-  mode: "0644"
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
+    mode: "0644"
     content: |
       {
         "iptables": true,
@@ -76,9 +76,9 @@
     mode: '0755'
 
 - name: Configure Docker Daemon.json
-  mode: "0644"
   ansible.builtin.copy:
     dest: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d/override.conf
+    mode: "0644"
     content: |
       [Service]
       Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false"
@@ -87,13 +87,13 @@
 - name: Ensure the directory for Portainer exists
   ansible.builtin.file:
     path: /home/{{ ansible_user_id }}/docker/portainer
-    state: directory
     mode: '0750'
+    state: directory
 
 - name: Configure Portainer with Docker Compose
-  mode: "0640"
   ansible.builtin.copy:
     dest: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
+    mode: "0640"
     content: |
       services:
         portainer:
