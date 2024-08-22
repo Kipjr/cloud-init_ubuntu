@@ -36,13 +36,13 @@
   register: file_check_docker_rootless
 
 - name: Disable Docker.service
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: docker.service
     masked: true
     enabled: false
 
 - name: Disable Docker.socket
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: docker.socket
     masked: true
     enabled: false
@@ -125,7 +125,7 @@
     group: "{{ ansible_user_gid }}"
 
 - name: Run the Docker service
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: docker
     enabled: true
     state: reloaded
