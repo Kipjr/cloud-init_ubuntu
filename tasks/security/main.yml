@@ -2,7 +2,7 @@
 - name: Apply CIS-remediation
   file: /home/{{ ansible_user_id }}/.ansible/roles/ubuntu22-cis/site.yml
   become: yes
-  become_user: root   
+  become_user: root
   vars:
     ansible_become: true
     ansible_become_user: "root"
