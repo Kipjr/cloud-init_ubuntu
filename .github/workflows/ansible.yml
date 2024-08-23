@@ -50,7 +50,7 @@ jobs:
             ${{ steps.pip-cache.outputs.dir }}
             ${{ steps.ansible-dir.outputs.ansibledir }}
             
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -65,7 +65,7 @@ jobs:
           path: |
             ${{ steps.ansible-dir.outputs.ansibledir }}
             ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}
 
       - name: Run Ansible-lint
         id: check_lint
@@ -82,7 +82,7 @@ jobs:
         with:
           sarif_file: results.sarif
 
-  execute_playbook:
+  playbook:
     needs: lint
     if: ${{ needs.lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
@@ -101,4 +101,4 @@ jobs:
           pip install ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook site.yml
+        run: ansible-playbook -i inventory site.yml
