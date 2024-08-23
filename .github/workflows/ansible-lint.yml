@@ -39,15 +39,14 @@ jobs:
           path: |
             ${{ steps.pip-cache.outputs.dir }}
             ~/.ansible
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}-{{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --cache-dir ~/.cache/pip ansible ansible-lint
+          pip install --upgrade --cache-dir ~/.cache/pip pip ansible ansible-lint
 
       # Save the cache after dependencies are installed
       - name: Save pip and Python environment
