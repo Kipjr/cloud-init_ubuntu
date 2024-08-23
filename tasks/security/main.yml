@@ -1,24 +1,25 @@
 ---
 - name: Apply CIS-remediation
-  file: /home/{{ ansible_user_id }}/.ansible/roles/ubuntu22-cis/site.yml
-  become: true
-  become_user: root
-  vars:
-    ansible_become: true
-    ansible_become_user: "root"
-    ansible_become_method: "sudo"
-    setup_audit: true
-    run_audit: true
-    audit_only: false
-    ubtu22cis_level_2: false
-    ubtu22cis_uses_root: true
-    ubtu22cis_rule_1_4_3: false
-    ubtu22cis_rule_6_1_10: false
-    ubtu22cis_rule_6_1_11: false
-    ubtu22cis_rule_6_1_12: false
-    ubtu22cis_rule_6_1_13: false
-    ubtu22cis_snmp_server: true
-    ubtu22cis_nfs_server: false
-    ubtu22cis_nfs_client: false
-    ubtu22cis_remote_log_server: "127.0.0.1"
-    ubtu22cis_sshd_allow_users: "{{ ansible_user_id }}"
+  ansible.builtin.include_playbook:
+    file: /home/{{ ansible_user_id }}/.ansible/roles/ubuntu22-cis/site.yml
+    become: true
+    become_user: root
+    vars:
+      ansible_become: true
+      ansible_become_user: "root"
+      ansible_become_method: "sudo"
+      setup_audit: true
+      run_audit: true
+      audit_only: false
+      ubtu22cis_level_2: false
+      ubtu22cis_uses_root: true
+      ubtu22cis_rule_1_4_3: false
+      ubtu22cis_rule_6_1_10: false
+      ubtu22cis_rule_6_1_11: false
+      ubtu22cis_rule_6_1_12: false
+      ubtu22cis_rule_6_1_13: false
+      ubtu22cis_snmp_server: true
+      ubtu22cis_nfs_server: false
+      ubtu22cis_nfs_client: false
+      ubtu22cis_remote_log_server: "127.0.0.1"
+      ubtu22cis_sshd_allow_users: "{{ ansible_user_id }}"
