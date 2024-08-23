@@ -13,8 +13,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  ansible-lint:
     runs-on: ubuntu-latest
+    outputs:
+      lint_success: ${{ steps.check_lint.outputs.lint_success }}
     permissions:
       security-events: write
     strategy:
@@ -22,6 +24,7 @@ jobs:
         python-version: ["3.10"]
 
     steps:
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -39,10 +42,9 @@ jobs:
           path: |
             ${{ steps.pip-cache.outputs.dir }}
             ~/.ansible
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}-{{ github.run_id }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -57,11 +59,38 @@ jobs:
             ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}
 
-      - name: Run ansible-lint
+      - name: Run Ansible-lint
+        id: check_lint
         run: |
-          ansible-lint --exclude .github proxmox -q -f sarif --sarif-file results.sarif | tee results.sarif
+          ansible-lint --exclude .github proxmox -f sarif > results.sarif || echo "Linting failed"
+        continue-on-error: true
+
+      - name: Set Lint Success Output
+        id: lint_check
+        run: echo "lint_success=$([[ ! -s results.sarif ]] && echo true || echo false)" >> $GITHUB_ENV
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
+
+  execute_playbook:
+    needs: ansible-lint
+    if: ${{ needs.ansible-lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ ansible-lint.matrix.python-version }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook site.yml
