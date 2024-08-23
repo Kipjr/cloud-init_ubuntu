@@ -2,10 +2,14 @@ name: Ansible
 
 on: 
   push:
+    paths:
+      - '**.yml'
     branches-ignore:
       - master
   pull_request:
     types: [opened, reopened]
+    paths:
+      - '**.yml'
   workflow_dispatch:
 
 jobs:
@@ -20,16 +24,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Cache pip packages and Python environment
-      - uses: actions/cache/restore@v4
+      - name: Get pip cache dir
+        id: pip-cache
+        shell: bash
+        run: |
+          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+      - name: pip cache
+        uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/pip
-            ~/.venv # if you use a virtual environment
-          key: ${{ runner.os }}-pip-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+            ${{ steps.pip-cache.outputs.dir }}
+            ~/.ansible
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-python-${{ matrix.python-version }}-
-
+            ${{ runner.os }}-pip-
+      
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -45,7 +55,8 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: |
-            ~/.cache/pip
+            ~/.ansible
+            ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
 
       - name: Run ansible-lint
