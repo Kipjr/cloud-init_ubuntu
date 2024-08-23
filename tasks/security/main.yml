@@ -1,6 +1,6 @@
 ---
 - name: Apply CIS-remediation
-    ansible.builtin.import_playbook:
+  ansible.builtin.import_playbook:
     file: /home/{{ ansible_user_id }}/.ansible/roles/ubuntu22-cis/site.yml
     become: true
     become_user: root
