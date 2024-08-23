@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       lint_success: ${{ steps.check_lint.outputs.lint_success }}
+      python-version: ${{ matrix.python-version }}
     permissions:
       security-events: write
     strategy:
@@ -85,7 +86,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ ansible-lint.matrix.python-version }}
+          python-version: ${{ ansible-lint.outputs.python-version }}
 
       - name: Install Ansible
         run: |
