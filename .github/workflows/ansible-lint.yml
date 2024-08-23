@@ -39,10 +39,9 @@ jobs:
           path: |
             ${{ steps.pip-cache.outputs.dir }}
             ~/.ansible
-          key: ${{ runner.os }}-pip-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}
           restore-keys: |
-            ${{ runner.os }}-pip-python-${{ matrix.python-version }}-
-            
+            ${{ runner.os }}-pip-
       - uses: actions/checkout@v4
 
       - name: Install dependencies
@@ -57,7 +56,7 @@ jobs:
           path: |
             ~/.ansible
             ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}
 
       - name: Run ansible-lint
         run: |
