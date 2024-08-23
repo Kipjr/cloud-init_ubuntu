@@ -25,7 +25,6 @@ jobs:
         with:
           path: |
             ~/.cache/pip
-            ~/.venv # if you use a virtual environment
           key: ${{ runner.os }}-pip-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-python-${{ matrix.python-version }}-
