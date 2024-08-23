@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
+  ansible-lint:
     runs-on: ubuntu-latest
     outputs:
       lint_success: ${{ steps.check_lint.outputs.lint_success }}
@@ -83,8 +83,8 @@ jobs:
           sarif_file: results.sarif
 
   execute_playbook:
-    needs: lint
-    if: ${{ needs.lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
+    needs: ansible-lint
+    if: ${{ needs.ansible-lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -93,7 +93,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ needs.lint.outputs.python-version }}
+          python-version: ${{ needs.ansible-lint.outputs.python-version }}
 
       - name: Install Ansible
         run: |
@@ -101,4 +101,4 @@ jobs:
           pip install ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook site.yml
+        run: ansible-playbook -i inventory site.yml
