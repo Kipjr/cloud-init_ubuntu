@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  ansible-lint:
+  lint:
     runs-on: ubuntu-latest
     outputs:
       lint_success: ${{ steps.check_lint.outputs.lint_success }}
@@ -50,7 +50,7 @@ jobs:
             ${{ steps.pip-cache.outputs.dir }}
             ${{ steps.ansible-dir.outputs.ansibledir }}
             
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -65,7 +65,7 @@ jobs:
           path: |
             ${{ steps.ansible-dir.outputs.ansibledir }}
             ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible-lint.yml') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}
 
       - name: Run Ansible-lint
         id: check_lint
@@ -82,9 +82,9 @@ jobs:
         with:
           sarif_file: results.sarif
 
-  execute_playbook:
-    needs: ansible-lint
-    if: ${{ needs.ansible-lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
+  playbook:
+    needs: lint
+    if: ${{ needs.lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -93,7 +93,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ needs.ansible-lint.outputs.python-version }}
+          python-version: ${{ needs.lint.outputs.python-version }}
 
       - name: Install Ansible
         run: |
