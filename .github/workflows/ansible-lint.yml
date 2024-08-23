@@ -2,10 +2,14 @@ name: Ansible
 
 on: 
   push:
+    paths:
+      - '**.yml'
     branches-ignore:
       - master
   pull_request:
     types: [opened, reopened]
+    paths:
+      - '**.yml'
   workflow_dispatch:
 
 jobs:
