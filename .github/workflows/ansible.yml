@@ -16,6 +16,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     outputs:
+      lint_success: ${{ steps.lint_check.outputs.lint_success }}
       python-version: ${{ matrix.python-version }}
     permissions:
       security-events: write
@@ -67,9 +68,10 @@ jobs:
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}
 
       - name: Run Ansible-lint
-        id: check_lint
+        id: lint_check
         run: |
           ansible-lint --exclude .github proxmox -f sarif > results.sarif
+          echo "lint_success=$([[ $? -eq 0 ]] && echo true || echo false)" >> $GITHUB_ENV
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
@@ -78,7 +80,7 @@ jobs:
 
   playbook:
     needs: lint
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ needs.lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
