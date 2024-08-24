@@ -16,7 +16,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     outputs:
-      lint_success: ${{ steps.check_lint.outputs.lint_success }}
+      lint_success: ${{ steps.lint_check.outputs.lint_success }}
       python-version: ${{ matrix.python-version }}
     permissions:
       security-events: write
@@ -26,56 +26,35 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up Python ${{ matrix.python-version }}
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Get pip cache dir
-        id: pip-cache
-        shell: bash
+      
+      - name: Install pipenv
         run: |
-          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-     
-      - name: Get Ansible dir
-        id: ansible-dir
-        shell: bash
-        run: |
-          echo "ansibledir=$(ansible-config dump | grep -Po '(?<=ANSIBLE_HOME\(default\) = )(.*)')" >> $GITHUB_OUTPUT
-
-      - name: Restore pip cache
+          python -m pip install pipenv
+          
+      - name: Cache pipenv
+        id: cache-pipenv
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ steps.pip-cache.outputs.dir }}
-            ${{ steps.ansible-dir.outputs.ansibledir }}
-            
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+           
       - name: Install dependencies
+        if: ${{ steps.cache-pipenv.outputs.cache-hit != 'true' }}
         run: |
-          pip install --upgrade --cache-dir ~/.cache/pip pip ansible ansible-lint
-
-      # Save the cache after dependencies are installed
-      - name: Save pip and Python environment
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ${{ steps.ansible-dir.outputs.ansibledir }}
-            ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/ansible.yml') }}
+          pipenv install ansible ansible-lint
 
       - name: Run Ansible-lint
-        id: check_lint
-        run: |
-          ansible-lint --exclude .github proxmox -f sarif > results.sarif || echo "Linting failed"
-        continue-on-error: true
-
-      - name: Set Lint Success Output
         id: lint_check
-        run: echo "lint_success=$([[ ! -s results.sarif ]] && echo true || echo false)" >> $GITHUB_ENV
+        continue-on-error: true
+        run: |
+          pipenv run ansible-lint --exclude .github proxmox -f sarif > results.sarif
+          echo "lint_success=$([[ $? -eq 0 ]] && echo true || echo false)" >> $GITHUB_ENV
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
