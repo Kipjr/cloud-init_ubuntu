@@ -7,7 +7,7 @@ on:
     branches-ignore:
       - master
   pull_request:
-    types: [opened, reopened]
+    types: [closed,review_requested]
     paths:
       - '**.yml'
   workflow_dispatch:
@@ -55,7 +55,12 @@ jobs:
         run: |
           pipenv run ansible-lint --exclude .github proxmox -f sarif > results.sarif
           echo "lint_success=$([[ $? -eq 0 ]] && echo true || echo false)" >> $GITHUB_ENV
-
+          
+      - name: Show lint success and Github Event Name
+        run: | 
+          echo "event_name: ${{ github.event_name }}"
+          echo "lint_success: ${{ env.lint_success }}"
+        
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
         with:
