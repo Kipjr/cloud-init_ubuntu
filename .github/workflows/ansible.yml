@@ -55,7 +55,13 @@ jobs:
         run: |
           pipenv run ansible-lint --exclude .github proxmox -f sarif > results.sarif
           echo "lint_success=$([[ $? -eq 0 ]] && echo true || echo false)" >> $GITHUB_ENV
-
+          
+      - name: Show lint success and Github Event Name
+        id: set_output
+        run: | 
+          echo "::set-output name=lint_success::${{ env.lint_success }}"
+          echo "::set-output name=gh_event_name::${{ github.event_name }}"
+        
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
         with:
