@@ -22,21 +22,16 @@
     repo: "deb https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
     state: present
 
-- name: Check if Webmin is installed
-  ansible.builtin.stat:
-    path: /etc/webmin
-  register: dir_check_webmin
-
-- name: Download Webmin
-  when: not dir_check_webmin.stat.exists
+- name: Download Webmin Repo Setup
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
     dest: /tmp/setup-repos.sh
     mode: '0740'
 
-- name: Configure Webmin repository
+- name: Configure Webmin Repo
   become: true
-  when: not dir_check_webmin.stat.exists
+  args:
+    creates: /etc/apt/sources.list.d/webmin.list
   ansible.builtin.shell: |
     sh /tmp/setup-repos.sh -f
 
@@ -44,7 +39,6 @@
   become: true
   ansible.builtin.apt:
     update_cache: true
-    upgrade: full
 
 - name: Install required packages
   become: true

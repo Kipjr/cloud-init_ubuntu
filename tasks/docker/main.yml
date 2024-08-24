@@ -47,8 +47,10 @@
     masked: true
     enabled: false
 
-- name: Install Docker (rootless)
+- name: Install Docker (rootless, using systemd)
   when: not file_check_docker_rootless.stat.exists
+  args:
+    creates: /home/{{ ansible_user_uid }}/.config/systemd/user/docker.service
   ansible.builtin.shell: |
     rm /var/run/docker.sock
     dockerd-rootless-setuptool.sh install
