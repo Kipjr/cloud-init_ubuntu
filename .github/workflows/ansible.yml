@@ -7,10 +7,16 @@ on:
     branches-ignore:
       - master
   pull_request:
-    types: [closed,review_requested]
+    types: [created,closed,review_requested]
     paths:
       - '**.yml'
   workflow_dispatch:
+    inputs:
+      run_playbook:
+        description: "Run Playbook?"
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   lint:
@@ -68,7 +74,7 @@ jobs:
 
   playbook:
     needs: lint
-    if: ${{ needs.lint.outputs.lint_success == 'true' && github.event_name == 'pull_request' }}
+    if: ${{ needs.lint.outputs.lint_success == 'true' && inputs.run_playbook == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
