@@ -74,7 +74,7 @@ jobs:
 
   playbook:
     needs: lint
-    if: ${{ needs.lint.outputs.lint_success == true && inputs.run_playbook == true }}
+    if: ${{ inputs.run_playbook == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
