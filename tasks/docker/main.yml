@@ -36,12 +36,14 @@
   register: file_check_docker_rootless
 
 - name: Disable Docker.service
+  become: true
   ansible.builtin.systemd:
     name: docker.service
     masked: true
     enabled: false
 
 - name: Disable Docker.socket
+  become: true
   ansible.builtin.systemd:
     name: docker.socket
     masked: true
@@ -59,6 +61,7 @@
     loginctl enable-linger {{ ansible_user_id }}
 
 - name: Configure Docker Daemon.json
+  become: true
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     mode: "0644"
@@ -77,7 +80,8 @@
     state: directory
     mode: '0755'
 
-- name: Configure Docker Daemon.json
+- name: Configure systemd override for user
+  become: true
   ansible.builtin.copy:
     dest: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d/override.conf
     mode: "0644"
