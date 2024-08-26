@@ -1,8 +1,8 @@
 #!/usr/bin/env pwsh
 
 param (
-    [Parameter(Position=0)][string]$GitHubRepoUrl = $(throw "First argument, GitHub repo URL, cannot be empty"),
-    [Parameter(Position=1)][string]$PlaybookName = "playbook.yml",
+    [Parameter(Position=0)][string]$GitHubRepoUrl = "https://github.com/Kipjr/cloud-init_ubuntu",
+    [Parameter(Position=1)][string]$PlaybookName = "site.yml",
     [Parameter(Position=2)][string]$WorkingDir = "/tmp/ansible",
     [Parameter(Position=3)][string]$AnsibleArg
 )
@@ -19,6 +19,7 @@ if ($UUID -eq 0) {
 
 Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile "get-pip.py"
 python3 get-pip.py --user
+$env:PATH="/home/adminuser/.local/bin:$env:PATH"
 python3 -m pip install --user ansible
 
 # Create working directory and clone the repository
@@ -36,3 +37,37 @@ if (Test-Path -Path $PlaybookName) {
 } else {
     Write-Output "Playbook $PlaybookName does not exist."
 }
+
+
+
+
+#!/bin/bash
+set -e
+set -o pipefail
+
+UUID=$(id -u)
+if [ "$UUID" -eq 0 ]; then
+    echo "Please run as a regular user. Exiting..."
+    exit 1
+fi
+
+
+GITHUB_REPO_URL="${1:-https://github.com/Kipjr/cloud-init_ubuntu}"
+PLAYBOOK_NAME="${2:-playbook.yml}"
+WORKING_DIR="${3:-/tmp/ansible}"
+ANSIBLE_ARG="${4}"
+
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py --user
+export -p PATH=/home/${USER}/.local/bin:$PATH
+python3 -m pip install --user ansible
+
+mkdir -p "${WORKING_DIR}" && cd "${WORKING_DIR}"
+git clone "${GITHUB_REPO_URL}" git_repo && cd ./git_repo
+if [ -f "${PLAYBOOK_NAME}.yaml" ]; then
+    ansible-galaxy install -r collections/requirements.yml
+    ansible-playbook "${ANSIBLE_ARG}" "${PLAYBOOK_NAME}"
+else
+    echo "Playbook ${PLAYBOOK_NAME} does not exist."
+fi
+
