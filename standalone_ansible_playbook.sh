@@ -10,7 +10,7 @@ fi
 
 
 GITHUB_REPO_URL="${1:-https://github.com/Kipjr/cloud-init_ubuntu}"
-PLAYBOOK_NAME="${2:-playbook.yml}"
+PLAYBOOK_NAME="${2:-site.yml}"
 WORKING_DIR="${3:-/tmp/ansible}"
 ANSIBLE_ARG="${4}"
 
