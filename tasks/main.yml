@@ -1,7 +1,5 @@
 ---
 - name: Preparation
-  hosts: localhost
-  gather_facts: yes  # Ensure facts are gathered
   tasks:
     - name: Install roles and collections
       community.general.ansible_galaxy_install:
