@@ -22,10 +22,8 @@ packages:
   - apt-transport-https
   - software-properties-common
   - git
-
-late-commands:
-  - wget -O /tmp/script.sh https://raw.githubusercontent.com/Kipjr/cloud-init_ubuntu/master/standalone_ansible_playbook.sh && chmod +x /tmp/script.sh
-  - /tmp/script.sh
+runcmd:
+  - wget -O /tmp/script.sh https://raw.githubusercontent.com/Kipjr/cloud-init_ubuntu/master/standalone_ansible_playbook.sh && chmod +x /tmp/script.sh && /tmp/script.sh
 #ansible:
 #  package_name: ansible
 #  install_method: pip
