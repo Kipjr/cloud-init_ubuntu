@@ -129,11 +129,11 @@
         portainer_data:
     owner: "{{ ansible_user_uid }}"
     group: "{{ ansible_user_gid }}"
-    
+
 - name: Refresh env
-  when: always
-  ansible.builtin.shell: | 
-    /home/{{ ansible_user_id }}/.bashrc
+  ansible.builtin.shell: |
+    . /home/{{ ansible_user_id }}/.bashrc
+    exit 0
 
 - name: Run the Docker service
   ansible.builtin.systemd:
@@ -141,7 +141,7 @@
     enabled: true
     state: reloaded
     scope: user
-    
+
 - name: Start Docker Portainer
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user_id }}/docker/portainer
