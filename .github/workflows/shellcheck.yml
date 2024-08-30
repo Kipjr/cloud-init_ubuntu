@@ -8,9 +8,7 @@ on:
       - master
   workflow_dispatch:
 
-name: "ShellCheck"
 permissions: {}
-
 jobs:
   shellcheck:
     name: Shellcheck
