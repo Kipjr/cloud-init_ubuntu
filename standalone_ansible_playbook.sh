@@ -25,6 +25,7 @@ git clone "${GITHUB_REPO_URL}" git_repo
 cd git_repo
 if [ -f "$PWD/${PLAYBOOK_NAME}" ]; then
     ansible-galaxy install -r collections/requirements.yml
+    # shellcheck disable=2086
     ansible-playbook -i inventory ${ANSIBLE_ARG} "${PLAYBOOK_NAME}"
 else
     echo "Playbook ${PLAYBOOK_NAME} does not exist."
