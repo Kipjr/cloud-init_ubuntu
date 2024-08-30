@@ -131,6 +131,7 @@
     group: "{{ ansible_user_gid }}"
 
 - name: Refresh env
+  changed_when: true
   ansible.builtin.shell: |
     . /home/{{ ansible_user_id }}/.bashrc
     exit 0
