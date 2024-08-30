@@ -23,7 +23,9 @@ packages:
   - software-properties-common
   - git
 runcmd:
-  - wget -O /tmp/script.sh https://raw.githubusercontent.com/Kipjr/cloud-init_ubuntu/master/standalone_ansible_playbook.sh && chmod +x /tmp/script.sh && sudo -u ${CI_USER} /tmp/script.sh
+  - wget -O /tmp/script.sh https://raw.githubusercontent.com/Kipjr/cloud-init_ubuntu/master/standalone_ansible_playbook.sh
+  - chmod +x /tmp/script.sh 
+  - sudo -u ${CI_USER} /tmp/script.sh
 #ansible:
 #  package_name: ansible
 #  install_method: pip
