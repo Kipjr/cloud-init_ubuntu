@@ -14,7 +14,7 @@ nano "$temp_env"
 sed -i 's/^/export /g' "$temp_env"
 
 # Use the temporary environment file to perform envsubst
-# shellcheck source=.env.example
+# shellcheck source=./.env.example
 (source "$temp_env" && envsubst < ci-config-userdata.template.yaml > test.txt)
 
 # Clean up temporary environment file
