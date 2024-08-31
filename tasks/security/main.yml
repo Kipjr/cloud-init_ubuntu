@@ -1,7 +1,7 @@
 ---
 - name: Apply CIS-remediation for Ubuntu 22.04
   ansible.builtin.include_role:
-    name: ubuntu22-cis
+    name: ansible-lockdown/UBUNTU22-CIS
   vars:
     ansible_become: true
     ansible_become_user: "root"
