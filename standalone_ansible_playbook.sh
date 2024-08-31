@@ -14,8 +14,8 @@ PLAYBOOK_NAME="${2:-site.yml}"
 WORKING_DIR="${3:-/tmp/ansible}"
 ANSIBLE_ARG="${4}"
 
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python3 get-pip.py --user
+curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
+python3 /tmp/get-pip.py --user
 export -p PATH=/home/${USER}/.local/bin:$PATH
 python3 -m pip install --user ansible
 
