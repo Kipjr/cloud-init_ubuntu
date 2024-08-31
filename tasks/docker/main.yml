@@ -109,12 +109,12 @@
             - no-new-privileges:true
           volumes:
             - /etc/localtime:/etc/localtime:ro
-            - portainer_data:/data
+            - data:/data
           ports:
-            - "9000:9000"
-        portainer_agent:
-          image: portainer/portainer-agent:latest
-          container_name: portainer_agent
+            - "9443:9443"
+        agent:
+          image: portainer/agent:latest
+          container_name: agent
           restart: always
           security_opt:
             - no-new-privileges:true
@@ -125,7 +125,7 @@
           ports:
             - "9001:9001"
       volumes:
-        portainer_data:
+        data:
     owner: "{{ ansible_user_uid }}"
     group: "{{ ansible_user_gid }}"
 
