@@ -6,18 +6,48 @@
     ansible_become: true
     ansible_become_user: "root"
     ansible_become_method: "sudo"
+    ### Auditing
     setup_audit: true
     run_audit: true
     audit_only: false
     ubtu22cis_level_2: false
-    ubtu22cis_uses_root: true
+    
+      # Do not use boot password
+    ubtu22cis_ask_passwd_to_boot: false
     ubtu22cis_rule_1_4_3: false
+      # Do not patch UFW to do default deny
+    ubtu22cis_rule_3_5_1_7: false
+      # Takes alot of time: Ensure no unowned files or directories exist | Set unowned files/directories to configured owner
     ubtu22cis_rule_6_1_10: false
+      # Takes alot of time: Ensure no ungrouped files or directories exist | Get ungrouped files or directories
     ubtu22cis_rule_6_1_11: false
+      # Takes alot of time: Audit SUID executables | Find SUID executables
     ubtu22cis_rule_6_1_12: false
+     # Takes alot of time: Audit SGID executables | Find SGID executables
     ubtu22cis_rule_6_1_13: false
+    
+    ###
+    ### CIS Level 2
+    ###
+      # keep squashfs 
+    ubtu22cis_rule_1_1_1_2: false
+      # Disable AppArmor enforcement
+    ubtu22cis_rule_1_6_1_4: false
+    ubtu22cis_apparmor_disable: true
+    ubtu22cis_apparmor_mode: "complain"
+      # enable audit logs auto delete"
+    ubtu22cis_rule_4_1_2_2: false
+      # disable system disabling when audit logs are full"
+    ubtu22cis_rule_4_1_2_3: false
+      # breaks sudo during remediation: Ensure users must provide password for escalation
+    ubtu22cis_rule_5_3_4: false
+    
+    ###
+    ### Generic
+    ###
     ubtu22cis_snmp_server: true
     ubtu22cis_nfs_server: false
     ubtu22cis_nfs_client: false
     ubtu22cis_remote_log_server: "127.0.0.1"
     ubtu22cis_sshd_allow_users: "{{ ansible_user_id }}"
+
