@@ -11,7 +11,7 @@
     run_audit: true
     audit_only: false
     ubtu22cis_level_2: false
-    
+
       # Do not use boot password
     ubtu22cis_ask_passwd_to_boot: false
     ubtu22cis_rule_1_4_3: false
@@ -25,7 +25,7 @@
     ubtu22cis_rule_6_1_12: false
      # Takes alot of time: Audit SGID executables | Find SGID executables
     ubtu22cis_rule_6_1_13: false
-    
+
     ###
     ### CIS Level 2
     ###
@@ -41,7 +41,7 @@
     ubtu22cis_rule_4_1_2_3: false
       # breaks sudo during remediation: Ensure users must provide password for escalation
     ubtu22cis_rule_5_3_4: false
-    
+
     ###
     ### Generic
     ###
@@ -50,4 +50,3 @@
     ubtu22cis_nfs_client: false
     ubtu22cis_remote_log_server: "127.0.0.1"
     ubtu22cis_sshd_allow_users: "{{ ansible_user_id }}"
-
