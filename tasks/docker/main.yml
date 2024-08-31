@@ -144,5 +144,6 @@
 
 - name: Start Docker Portainer
   community.docker.docker_compose_v2:
+    docker_host: unix:///run/user/{{ ansible_user_uid }}/docker.sock
     project_src: /home/{{ ansible_user_id }}/docker/portainer
     state: present
