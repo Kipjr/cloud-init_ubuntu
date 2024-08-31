@@ -29,7 +29,7 @@
     ###
     ### CIS Level 2
     ###
-      # keep squashfs 
+      # keep squashfs
     ubtu22cis_rule_1_1_1_2: false
       # Disable AppArmor enforcement
     ubtu22cis_rule_1_6_1_4: false
