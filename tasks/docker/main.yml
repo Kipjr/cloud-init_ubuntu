@@ -87,7 +87,7 @@
     content: |
       [Service]
       Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false"
-      Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET="slirp4netns --cidr=10.249.0.0/24"
+      Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns --cidr=10.249.0.0/24"
 
 - name: Ensure the directory for Portainer exists
   ansible.builtin.file:
