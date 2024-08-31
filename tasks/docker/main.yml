@@ -81,7 +81,6 @@
     mode: '0755'
 
 - name: Configure systemd override for user
-  become: true
   ansible.builtin.copy:
     dest: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d/override.conf
     mode: "0644"
