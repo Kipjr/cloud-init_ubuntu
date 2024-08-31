@@ -8,21 +8,20 @@ if [ "$UUID" -eq 0 ]; then
     exit 1
 fi
 
-
 GITHUB_REPO_URL="${1:-https://github.com/Kipjr/cloud-init_ubuntu}"
 PLAYBOOK_NAME="${2:-site.yml}"
-WORKING_DIR="${3:-/tmp/ansible}"
+WORKING_DIR="${3:-/run/user/1000/tmp}"
 ANSIBLE_ARG="${4}"
-
-curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-python3 /tmp/get-pip.py --user
-export -p PATH=/home/${USER}/.local/bin:$PATH
-python3 -m pip install --user ansible
 
 mkdir -p "${WORKING_DIR}"
 cd "${WORKING_DIR}"
+curl https://bootstrap.pypa.io/get-pip.py -o "${WORKING_DIR}/get-pip.py"
+python3 "${WORKING_DIR}/get-pip.py" --user
+export -p PATH=/home/${USER}/.local/bin:$PATH
+python3 -m pip install --user ansible
+
 git clone "${GITHUB_REPO_URL}" git_repo
-cd git_repo
+cd "git_repo"
 if [ -f "$PWD/${PLAYBOOK_NAME}" ]; then
     ansible-galaxy install -r collections/requirements.yml
     # shellcheck disable=2086
