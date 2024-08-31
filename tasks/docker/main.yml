@@ -50,6 +50,7 @@
     enabled: false
 
 - name: Remove docker.sock
+  become: true
   ansible.builtin.file:
     path: /var/run/docker.sock
     state: absent
