@@ -81,14 +81,13 @@
     mode: '0755'
 
 - name: Configure systemd override for user
-  become: true
   ansible.builtin.copy:
     dest: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d/override.conf
     mode: "0644"
     content: |
       [Service]
       Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false"
-      Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET="slirp4netns --cidr=10.249.0.0/24"
+      Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns --cidr=10.249.0.0/24"
 
 - name: Ensure the directory for Portainer exists
   ansible.builtin.file:
@@ -110,12 +109,12 @@
             - no-new-privileges:true
           volumes:
             - /etc/localtime:/etc/localtime:ro
-            - portainer_data:/data
+            - data:/data
           ports:
-            - "9000:9000"
-        portainer_agent:
-          image: portainer/portainer-agent:latest
-          container_name: portainer_agent
+            - "9443:9443"
+        agent:
+          image: portainer/agent:latest
+          container_name: agent
           restart: always
           security_opt:
             - no-new-privileges:true
@@ -126,7 +125,7 @@
           ports:
             - "9001:9001"
       volumes:
-        portainer_data:
+        data:
     owner: "{{ ansible_user_uid }}"
     group: "{{ ansible_user_gid }}"
 
@@ -145,5 +144,6 @@
 
 - name: Start Docker Portainer
   community.docker.docker_compose_v2:
+    docker_host: unix:///run/user/{{ ansible_user_uid }}/docker.sock
     project_src: /home/{{ ansible_user_id }}/docker/portainer
     state: present

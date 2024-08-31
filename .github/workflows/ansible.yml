@@ -4,12 +4,11 @@ on:
   push:
     paths:
       - '**.yml'
+      - '**.sh'
+      - '**.ps1'
     branches-ignore:
       - master
   pull_request:
-    types: [created,closed,review_requested]
-    paths:
-      - '**.yml'
   workflow_dispatch:
     inputs:
       run_playbook:
