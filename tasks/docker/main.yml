@@ -137,6 +137,21 @@
       Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false"
       Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns --cidr=10.249.0.0/24"
 
+- name: Ensure sysctl configurations for Docker are present in /etc/sysctl.d/docker.conf
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.d/docker.conf
+    line: "{{ item }}"
+    create: yes
+    state: present
+  with_items:
+    - "net.ipv4.ip_unprivileged_port_start=0"
+    - "net.ipv4.ping_group_range=0 2147483647"
+
+- name: Apply sysctl settings
+  ansible.builtin.command:
+    cmd: sysctl --system
+  become: yes
+      
 - name: Ensure the directory for Portainer exists
   ansible.builtin.file:
     path: /home/{{ ansible_user_id }}/docker/portainer
