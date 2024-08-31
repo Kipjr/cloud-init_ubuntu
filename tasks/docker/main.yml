@@ -49,16 +49,38 @@
     masked: true
     enabled: false
 
+- name: Remove docker.sock
+  ansible.builtin.file:
+    path: /var/run/docker.sock
+    state: absent
+
 - name: Install Docker (rootless, using systemd)
   when: not file_check_docker_rootless.stat.exists
   args:
     creates: /home/{{ ansible_user_uid }}/.config/systemd/user/docker.service
   ansible.builtin.shell: |
-    rm /var/run/docker.sock
     dockerd-rootless-setuptool.sh install
-    echo 'export PATH=/usr/bin:$PATH' >> /home/{{ ansible_user_id }}/.bashrc
-    echo "export DOCKER_HOST=unix:///run/user/{{ ansible_user_uid }}/docker.sock" >> /home/{{ ansible_user_id }}/.bashrc
-    loginctl enable-linger {{ ansible_user_id }}
+
+- name: Ensure /usr/bin is in PATH in .bashrc
+  lineinfile:
+    path: /home/{{ ansible_user_id }}/.bashrc
+    line: 'export PATH=/usr/bin:$PATH'
+    state: present
+    create: yes
+  when: "'export PATH=/usr/bin:$PATH' not in lookup('file', '/home/{{ ansible_user_id }}/.bashrc')"
+
+- name: Ensure DOCKER_HOST is set in .bashrc
+  lineinfile:
+    path: /home/{{ ansible_user_id }}/.bashrc
+    line: "export DOCKER_HOST=unix:///run/user/{{ ansible_user_uid }}/docker.sock"
+    state: present
+    create: yes
+  when: "'export DOCKER_HOST=unix:///run/user/{{ ansible_user_uid }}/docker.sock' not in lookup('file', '/home/{{ ansible_user_id }}/.bashrc')"
+
+- name: Enable lingering for the user
+  command: loginctl enable-linger {{ ansible_user_id }}
+  when: >
+    "Linger=yes" not in lookup('pipe', 'loginctl show-user {{ ansible_user_id }} --property=Linger')
 
 - name: Configure Docker Daemon.json
   become: true
