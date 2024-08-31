@@ -70,6 +70,7 @@
   ansible.builtin.command: grep -q 'export PATH=/usr/bin:$PATH' /home/{{ ansible_user_id }}/.bashrc
   register: bashrc_path_usr_bin_check
   ignore_errors: true
+  changed_when: false
 
 - name: Ensure /usr/bin is in PATH in .bashrc
   ansible.builtin.lineinfile:
@@ -84,6 +85,7 @@
   ansible.builtin.command: grep -q 'export DOCKER_HOST=unix:///run/user/{{ ansible_user_uid }}/docker.sock' /home/{{ ansible_user_id }}/.bashrc
   register: bashrc_docker_host_check
   ignore_errors: true
+  changed_when: false
 
 - name: Ensure DOCKER_HOST is set in .bashrc
   ansible.builtin.lineinfile:
@@ -97,6 +99,7 @@
 - name: Check if lingering is enabled for the user
   ansible.builtin.command: loginctl show-user {{ ansible_user_id }} --property=Linger
   register: linger_status
+  changed_when: false
 
 - name: Enable lingering for the user
   ansible.builtin.command: loginctl enable-linger {{ ansible_user_id }}
