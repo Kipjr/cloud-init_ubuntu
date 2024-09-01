@@ -6,12 +6,20 @@
 
 - name: Packages
   ansible.builtin.import_tasks: packages/main.yml
+  tags:
+    - packages
 
 - name: Docker
   ansible.builtin.import_tasks: docker/main.yml
+  tags:
+    - docker
 
 - name: Configuration
   ansible.builtin.import_tasks: configuration/main.yml
+  tags:
+    - configure
 
 - name: Security
   ansible.builtin.import_tasks: security/main.yml
+  tags:
+    - security  
