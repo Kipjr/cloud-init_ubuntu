@@ -138,7 +138,7 @@
   ansible.builtin.file:
     path: /home/{{ ansible_user_id }}/.config/systemd/user/docker.service.d
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Configure systemd override for user
   ansible.builtin.copy:
@@ -153,17 +153,20 @@
   ansible.builtin.lineinfile:
     path: /etc/sysctl.d/docker.conf
     line: "{{ item }}"
-    create: yes
+    create: true
     state: present
+    mode: "0644"
   with_items:
     - "net.ipv4.ip_unprivileged_port_start=0"
     - "net.ipv4.ping_group_range=0 2147483647"
 
 - name: Apply sysctl settings
-  ansible.builtin.command:
-    cmd: sysctl --system
-  become: yes
-      
+  become: true
+  changed_when: true
+  ansible.builtin.shell: |
+    sysctl --system
+    exit 0
+    
 - name: Ensure the directory for Portainer exists
   when: ubtu22_portainer_agent
   ansible.builtin.file:
