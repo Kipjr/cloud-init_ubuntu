@@ -1,4 +1,5 @@
 ubtu22_vm: true
+ubtu22_pkg_webmin: true
 ubtu22_portainer_host: true
 ubtu22_portainer_agent: true
 ubtu22_ufw_rules_default:
