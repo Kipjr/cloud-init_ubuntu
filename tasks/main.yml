@@ -22,4 +22,4 @@
 - name: Security
   ansible.builtin.import_tasks: security/main.yml
   tags:
-    - security  
+    - security
