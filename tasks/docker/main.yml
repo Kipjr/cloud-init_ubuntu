@@ -166,7 +166,7 @@
   ansible.builtin.shell: |
     sysctl --system
     exit 0
-    
+
 - name: Ensure the directory for Portainer exists
   when: ubtu22_portainer_agent
   ansible.builtin.file:
