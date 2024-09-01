@@ -55,6 +55,18 @@
     path: /var/run/docker.sock
     state: absent
 
+- name: Allow incoming access to eth0
+  community.general.ufw:
+    rule: allow
+    interface: eth0
+    direction: in
+    proto: tcp
+    to_port: '{{ item }}'
+  loop:
+    - 80
+    - 443
+    - 9443
+
 - name: Install Docker (rootless, using systemd)
   when: not file_check_docker_rootless.stat.exists
   become: true
