@@ -23,12 +23,16 @@
     state: present
 
 - name: Download Webmin Repo Setup
+  when:
+    - ubtu22_pkg_webmin
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
     dest: /tmp/setup-repos.sh
     mode: '0740'
 
 - name: Configure Webmin Repo
+  when:
+    - ubtu22_pkg_webmin
   become: true
   args:
     creates: /etc/apt/sources.list.d/webmin.list
@@ -47,7 +51,6 @@
       - ufw
       - ethtool
       - htop
-      - lshw
       - screen
       - nano
       - net-tools
@@ -55,9 +58,6 @@
       - openssl
       - build-essential
       - p7zip-full
-      - hw-probe
-      - snmpd
-      - snmp-mibs-downloader
       - curl
       - gnupg
       - apt-transport-https
@@ -70,5 +70,33 @@
       - unattended-upgrades
       - pkg-config
       - powershell
+    state: present
+
+- name: Install Webmin
+  when:
+    - ubtu22_pkg_webmim
+  become: true
+  ansible.builtin.apt:
+    name:
       - webmin
+    state: present
+
+- name: Install hardware packages
+  when:
+    - not ubtu22_vm
+  become: true
+  ansible.builtin.apt:
+    name:
+      - lshw
+      - hw-probe
+    state: present
+
+- name: Install SNMP
+  when:
+    - ubtu22_pkg_snmp
+  become: true
+  ansible.builtin.apt:
+    name:
+      - snmpd
+      - snmp-mibs-downloader
     state: present

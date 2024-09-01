@@ -4,7 +4,7 @@ collections:
     type: galaxy
 
 roles:
-  - name: ansible-lockdown/UBUNTU22-CIS
+  - name: ansible-lockdown.ubuntu22-cis
     src: https://github.com/ansible-lockdown/UBUNTU22-CIS.git
     version: main
     scm: git
