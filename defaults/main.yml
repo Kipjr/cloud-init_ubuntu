@@ -1,6 +1,16 @@
-ubtu22_ufw_rules: false
-ubtu22_pkg_list: false
-
+ubtu22_vm: true
+ubtu22_portainer_host: true
+ubtu22_portainer_agent: true
+ubtu22_ufw_rules_default:
+  - ufw allow out 80
+  - ufw allow out 443
+ubtu22_ufw_rules_portainer_host:
+  - ufw allow from 127.0.0.1 to any port 9443 proto tcp comment 'Portainer'
+ubtu22_ufw_rules_portainer_agent:
+  - ufw allow from 127.0.0.1 to any port 9001 proto tcp comment 'Portainer Agent'
+ubtu22_ufw_rules_traefik:
+  - ufw allow from 127.0.0.1 to any port 443 proto tcp comment 'Traefik Websecure'
+  - ufw allow from 127.0.0.1 to any port 80 proto tcp comment 'Traefik Web'
 
 ###
 ### ubtu22cis variables
