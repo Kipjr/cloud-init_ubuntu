@@ -74,7 +74,7 @@
 
 - name: Install Webmin
   when:
-    - ubtu22_pkg_webmim
+    - ubtu22_pkg_webmin
   become: true
   ansible.builtin.apt:
     name:
