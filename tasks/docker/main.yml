@@ -150,6 +150,7 @@
       Environment="DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns --cidr=10.249.0.0/24"
 
 - name: Ensure sysctl configurations for Docker are present in /etc/sysctl.d/docker.conf
+  become: true
   ansible.builtin.lineinfile:
     path: /etc/sysctl.d/docker.conf
     line: "{{ item }}"
