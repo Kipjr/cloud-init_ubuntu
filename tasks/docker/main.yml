@@ -186,6 +186,8 @@
     create: true
     state: "absent"
     content: |
+      volumes:
+        data:
       services:
         agent:
           image: portainer/agent:latest
@@ -217,9 +219,6 @@
             - data:/data
           ports:
             - "9443:9443"
-      volumes:
-        data:
-        
 - name: Refresh env
   changed_when: true
   ansible.builtin.shell: |
