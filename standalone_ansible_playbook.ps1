@@ -6,11 +6,9 @@ param (
     [Parameter(Position=2)][string]$WorkingDir = "/tmp",
     [Parameter(Position=3)][string]$AnsibleArg
 )
-# Set error handling and strict mode
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 3
 
-# Ensure script runs as a non-root user
 $UUID = (id -u)
 if ($UUID -eq 0) {
     Write-Host "Please run as a regular user. Exiting..."
@@ -30,7 +28,6 @@ python3 -m pip install --user ansible
 git clone $GitHubRepoUrl git_repo
 Set-Location -Path "${TMPDIR}/git_repo"
 
-# Check if the playbook file exists and run it
 if (Test-Path -Path $PlaybookName) {
     ansible-galaxy install -r collections/requirements.yml
     ansible-playbook -v -i inventory "$AnsibleArg" "$PlaybookName"
