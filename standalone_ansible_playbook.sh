@@ -10,13 +10,13 @@ fi
 
 GITHUB_REPO_URL="${1:-https://github.com/Kipjr/cloud-init_ubuntu}"
 PLAYBOOK_NAME="${2:-site.yml}"
-WORKING_DIR="${3:-/run/user/1000/tmp}"
+WORKING_DIR="${3:-/tmp}"
 ANSIBLE_ARG="${4}"
 
-mkdir -p "${WORKING_DIR}"
 cd "${WORKING_DIR}"
-curl https://bootstrap.pypa.io/get-pip.py -o "${WORKING_DIR}/get-pip.py"
-python3 "${WORKING_DIR}/get-pip.py" --user
+TMPDIR=$(mktemp -d -p "${WORKING_DIR}"  ansible.XXXX)
+curl https://bootstrap.pypa.io/get-pip.py -o "${TMPDIR}/get-pip.py"
+python3 "${TMPDIR}/get-pip.py" --user
 export -p PATH=/home/${USER}/.local/bin:$PATH
 python3 -m pip install --user ansible
 
@@ -29,3 +29,4 @@ if [ -f "$PWD/${PLAYBOOK_NAME}" ]; then
 else
     echo "Playbook ${PLAYBOOK_NAME} does not exist."
 fi
+cd "${WORKING_DIR}"
