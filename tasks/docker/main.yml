@@ -178,13 +178,15 @@
 
 - name: Configure Portainer Agent with Docker Compose
   when: ubtu22_portainer_agent
-  ansible.builtin.copy:
-    dest: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
+  ansible.builtin.blockinfile:
+    path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
     mode: "0640"
     owner: "{{ ansible_user_uid }}"
     group: "{{ ansible_user_gid }}"
+    create: true
+    state: "absent"
     content: |
-      service:
+      services:
         agent:
           image: portainer/agent:latest
           container_name: agent
@@ -202,10 +204,8 @@
   when: ubtu22_portainer_host and ubtu22_portainer_agent
   ansible.builtin.blockinfile:
     path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
+    state: "absent"
     block: |
-      volumes:
-        data:
-      services:
         portainer:
           image: portainer/portainer-ee:latest
           container_name: portainer
@@ -217,7 +217,9 @@
             - data:/data
           ports:
             - "9443:9443"
-
+      volumes:
+        data:
+        
 - name: Refresh env
   changed_when: true
   ansible.builtin.shell: |
