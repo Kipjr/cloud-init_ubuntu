@@ -176,18 +176,19 @@
     mode: '0750'
     state: directory
 
-- name: Configure Portainer Agent with Docker Compose
-  when: ubtu22_portainer_agent
+- name: Configure Portainer with Docker Compose
   ansible.builtin.blockinfile:
+    append_newline: true
+    prepend_newline: true
+    create: true
     path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
     mode: "0640"
     owner: "{{ ansible_user_uid }}"
     group: "{{ ansible_user_gid }}"
-    create: true
-    state: "absent"
     content: |
       volumes:
         data:
+      
       services:
         agent:
           image: portainer/agent:latest
@@ -201,13 +202,7 @@
             - /home/{{ ansible_user_id }}/.local/share/docker/volumes:/var/lib/docker/volumes
           ports:
             - "9001:9001"
-
-- name: Update with Portainer EE
-  when: ubtu22_portainer_host and ubtu22_portainer_agent
-  ansible.builtin.blockinfile:
-    path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
-    state: "absent"
-    block: |
+      
         portainer:
           image: portainer/portainer-ee:latest
           container_name: portainer
@@ -219,6 +214,28 @@
             - data:/data
           ports:
             - "9443:9443"
+
+- name: Update Portainer EE
+  when: not ubtu22_portainer_host
+    path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    prepend_newline: true
+    insertafter: "portainer:"
+    block: |
+      profiles:
+        - host
+
+- name: Update Portainer Agent
+  when: not ubtu22_portainer_agent
+  ansible.builtin.blockinfile:
+    path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    prepend_newline: true
+    insertafter: "agent:"
+    block: |
+      profiles:
+        - agent
+
 - name: Refresh env
   changed_when: true
   ansible.builtin.shell: |
