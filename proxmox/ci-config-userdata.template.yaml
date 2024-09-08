@@ -25,7 +25,7 @@ packages:
 runcmd:
   - wget -O /run/cloud-init/tmp/script.sh https://raw.githubusercontent.com/Kipjr/cloud-init_ubuntu/master/standalone_ansible_playbook.sh
   - chmod +x /run/cloud-init/tmp/script.sh 
-  - sudo -u ${CI_USER} /run/cloud-init/tmp/script.sh
+  - sudo -iu ${CI_USER} -- /run/cloud-init/tmp/script.sh
 #ansible:
 #  package_name: ansible
 #  install_method: pip

@@ -199,7 +199,7 @@
             - "9001:9001"
 
 - name: Update with Portainer EE
-  when: ubtu22_portainer_host && ubtu22_portainer_agent
+  when: ubtu22_portainer_host and ubtu22_portainer_agent
   ansible.builtin.blockinfile:
     path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
     block: |
