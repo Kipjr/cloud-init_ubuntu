@@ -15,13 +15,15 @@ ANSIBLE_ARG="${4}"
 
 cd "${WORKING_DIR}"
 TMPDIR=$(mktemp -d -p "${WORKING_DIR}"  ansible.XXXX)
+cd "${TMPDIR}"
+
 curl https://bootstrap.pypa.io/get-pip.py -o "${TMPDIR}/get-pip.py"
 python3 "${TMPDIR}/get-pip.py" --user
 export -p PATH=/home/${USER}/.local/bin:$PATH
 python3 -m pip install --user ansible
 
 git clone "${GITHUB_REPO_URL}" git_repo
-cd "git_repo"
+cd "${TMPDIR}/git_repo"
 if [ -f "$PWD/${PLAYBOOK_NAME}" ]; then
     ansible-galaxy install -r collections/requirements.yml
     # shellcheck disable=SC2086 # Intended non-quoted var. Will break if quoted
