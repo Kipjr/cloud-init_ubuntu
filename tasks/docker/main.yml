@@ -217,6 +217,7 @@
 
 - name: Update Portainer EE
   when: not ubtu22_portainer_host
+  ansible.builtin.blockinfile:
     path: /home/{{ ansible_user_id }}/docker/portainer/docker-compose.yml
     marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
     prepend_newline: true
