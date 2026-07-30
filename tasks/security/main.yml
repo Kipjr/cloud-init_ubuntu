@@ -3,6 +3,17 @@
   become: true
   ansible.builtin.apt:
     update_cache: true
+    
+- name: Download git ssh-audit
+  ansible.builtin.git:
+    repo: 'https://github.com/jtesta/ssh-audit.git'
+    dest: /tmp/ssh-audit
+    
+- name: Execute SSH Audit
+  become: true
+  changed_when: true
+  ansible.builtin.shell: |
+    python3 /tmp/ssh-audit/ssh-audit.py localhost | tee "/home/{{ ansible_facts['user_id'] }}/ssh-audit.log"
 
 - name: Install required security packages
   become: true
