@@ -73,7 +73,7 @@ jobs:
            echo "lint_result: ${{ steps.lint_check.outcome }}"
        
        - name: Upload SARIF file
-         uses: github/codeql-action/upload-sarif@v4
+         uses: github/codeql-action/upload-sarif@v4.37.4
          with:
            sarif_file: results.sarif
 
